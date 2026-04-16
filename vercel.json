@@ -1,0 +1,24 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/fetch-prices",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/check-alerts",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/fetch-news",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+  "functions": {
+    "app/api/cron/fetch-prices/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/cron/fetch-news/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}
