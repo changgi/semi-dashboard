@@ -23,7 +23,11 @@ import { PredictionDashboard } from "@/components/PredictionDashboard";
 import { NewsSentimentTrend } from "@/components/NewsSentimentTrend";
 import { TradingSignalBoard } from "@/components/TradingSignalBoard";
 import { AgentDashboard } from "@/components/AgentDashboard";
+import { AgentComparisonTable } from "@/components/AgentComparisonTable";
+import { AgentDetailTable } from "@/components/AgentDetailTable";
 import { MacroPanel } from "@/components/MacroPanel";
+import { MacroChartsPanel } from "@/components/MacroChartsPanel";
+import { ForecastAccuracyPanel } from "@/components/ForecastAccuracyPanel";
 import { MacroCorrelation } from "@/components/MacroCorrelation";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
@@ -200,11 +204,23 @@ export default function Dashboard() {
         {/* 🌍 Macro Dashboard - 반도체 매크로 환경 (원유/국채/VIX/달러/한국) */}
         <div className="col-span-12"><MacroPanel /></div>
 
+        {/* 📈 Macro Charts - 히스토리 + 전망 차트 */}
+        <div className="col-span-12"><MacroChartsPanel /></div>
+
+        {/* 🎯 Forecast Accuracy - 예측 vs 실제 비교 (신뢰도 검증) */}
+        <div className="col-span-12"><ForecastAccuracyPanel /></div>
+
         {/* 🔗 Macro-Semi Correlation Matrix - 매크로-반도체 상관관계 히트맵 */}
         <div className="col-span-12"><MacroCorrelation /></div>
 
         {/* 🤖 AI Hedge Fund - 19 Agents Council */}
         <div className="col-span-12"><AgentDashboard /></div>
+
+        {/* 📊 AGENT COMPARISON - 여러 종목 비교표 */}
+        <div className="col-span-12"><AgentComparisonTable /></div>
+
+        {/* 🔬 AGENT DETAIL - 종목 상세 표 */}
+        <div className="col-span-12"><AgentDetailTable /></div>
 
         {/* 🎯 Trading Signal Board - 매매 시그널 (핵심) */}
         <div className="col-span-12"><TradingSignalBoard /></div>
