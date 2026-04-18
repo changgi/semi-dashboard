@@ -18,6 +18,7 @@ interface MacroItem {
   dayLow: number | null;
   volume: number | null;
   marketState: string | null;
+  sparkline?: number[];
 }
 
 interface MacroSignal {
@@ -46,10 +47,75 @@ const CATEGORY_META: Record<
 // ─────────────────────────────────────────────────────────
 // 매크로 카드
 // ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────
+// 스파크라인 SVG 컴포넌트
+// ─────────────────────────────────────────────────────────
+function Sparkline({
+  data,
+  color,
+  width = 120,
+  height = 32,
+}: {
+  data: number[];
+  color: string;
+  width?: number;
+  height?: number;
+}) {
+  if (!data || data.length < 2) return null;
+
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const padding = 2;
+
+  const xStep = (width - padding * 2) / (data.length - 1);
+  const points = data.map((v, i) => {
+    const x = padding + i * xStep;
+    const y = padding + (height - padding * 2) * (1 - (v - min) / range);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  const linePath = `M ${points.join(" L ")}`;
+  const areaPath = `${linePath} L ${(padding + (data.length - 1) * xStep).toFixed(1)},${height - padding} L ${padding},${height - padding} Z`;
+
+  const gradId = `spark-grad-${Math.random().toString(36).slice(2)}`;
+
+  return (
+    <svg width={width} height={height} className="overflow-visible">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill={`url(#${gradId})`} />
+      <path
+        d={linePath}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* 마지막 점 강조 */}
+      <circle
+        cx={padding + (data.length - 1) * xStep}
+        cy={padding + (height - padding * 2) * (1 - (data[data.length - 1] - min) / range)}
+        r="1.8"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// 매크로 카드
+// ─────────────────────────────────────────────────────────
 function MacroCard({ item }: { item: MacroItem }) {
   const up = (item.changePct ?? 0) >= 0;
   const color = up ? "up" : "down";
   const arrow = up ? "▲" : "▼";
+  const sparkColor = up ? "#00ff88" : "#ff3860";
 
   const formatPrice = (price: number | null) => {
     if (price === null) return "—";
@@ -59,9 +125,17 @@ function MacroCard({ item }: { item: MacroItem }) {
     return price.toLocaleString(undefined, { maximumFractionDigits: 0 });
   };
 
+  // 1개월 변동률 계산 (스파크라인 첫값 vs 마지막값)
+  let monthChangePct: number | null = null;
+  if (item.sparkline && item.sparkline.length >= 2) {
+    const first = item.sparkline[0];
+    const last = item.sparkline[item.sparkline.length - 1];
+    if (first > 0) monthChangePct = ((last - first) / first) * 100;
+  }
+
   return (
     <div className="border border-[var(--border)] rounded p-2 sm:p-2.5 hover:border-[var(--amber-dim)] transition-colors">
-      <div className="flex items-start justify-between mb-1">
+      <div className="flex items-start justify-between mb-1 gap-2">
         <div className="min-w-0 flex-1">
           <div className="text-[10px] sm:text-[11px] font-bold bright truncate kr">
             {item.name}
@@ -77,24 +151,40 @@ function MacroCard({ item }: { item: MacroItem }) {
         )}
       </div>
 
-      {/* 가격 */}
-      <div className="flex items-baseline gap-1.5 my-1">
-        <span className="text-[13px] sm:text-[15px] font-bold tick">
-          {item.category === "bond" || item.category === "vol"
-            ? `${formatPrice(item.price)}${item.category === "bond" ? "%" : ""}`
-            : `${formatPrice(item.price)}`}
-        </span>
-      </div>
-
-      {/* 변동률 */}
-      {item.changePct !== null && (
-        <div className={`text-[9px] sm:text-[10px] ${color} font-bold`}>
-          {arrow} {Math.abs(item.changePct).toFixed(2)}%
-          <span className="dim ml-1 font-normal text-[8px] sm:text-[9px]">
-            ({up ? "+" : ""}{(item.change ?? 0).toFixed(2)})
+      {/* 가격 + 스파크라인 (가로 배치) */}
+      <div className="flex items-end justify-between gap-2 my-1">
+        <div>
+          <span className="text-[13px] sm:text-[15px] font-bold tick">
+            {item.category === "bond" || item.category === "vol"
+              ? `${formatPrice(item.price)}${item.category === "bond" ? "%" : ""}`
+              : `${formatPrice(item.price)}`}
           </span>
+          {/* 변동률 */}
+          {item.changePct !== null && (
+            <div className={`text-[9px] sm:text-[10px] ${color} font-bold`}>
+              {arrow} {Math.abs(item.changePct).toFixed(2)}%
+              <span className="dim ml-1 font-normal text-[8px] sm:text-[9px]">
+                ({up ? "+" : ""}{(item.change ?? 0).toFixed(2)})
+              </span>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* 🎯 스파크라인 (1개월) */}
+        {item.sparkline && item.sparkline.length >= 2 && (
+          <div className="flex flex-col items-end">
+            <Sparkline data={item.sparkline} color={sparkColor} width={80} height={28} />
+            {monthChangePct !== null && (
+              <div className="text-[7px] sm:text-[8px] dim mt-0.5">
+                1M: <span className={monthChangePct >= 0 ? "up" : "down"}>
+                  {monthChangePct >= 0 ? "+" : ""}
+                  {monthChangePct.toFixed(1)}%
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* 반도체 영향 */}
       <div className="text-[7px] sm:text-[8px] dim mt-1.5 pt-1.5 border-t border-[var(--border)] line-clamp-2 kr leading-tight">

@@ -57,8 +57,30 @@ export async function GET() {
         dayLow: q?.dayLow ?? null,
         volume: q?.volume ?? null,
         marketState: q?.marketState ?? null,
+        sparkline: [] as number[], // 나중에 채움
       };
     });
+
+    // ★ 각 심볼의 1개월 스파크라인 데이터 병렬 fetch
+    await Promise.all(
+      items.map(async (item) => {
+        try {
+          const bars = await fetchYahooHistory(item.symbol, "1mo");
+          // 최대 30개 데이터 포인트만 사용
+          const step = Math.max(1, Math.floor(bars.length / 30));
+          const sparkline: number[] = [];
+          for (let i = 0; i < bars.length; i += step) {
+            sparkline.push(bars[i].close);
+          }
+          if (bars.length > 0 && sparkline[sparkline.length - 1] !== bars[bars.length - 1].close) {
+            sparkline.push(bars[bars.length - 1].close);
+          }
+          item.sparkline = sparkline;
+        } catch {
+          item.sparkline = [];
+        }
+      })
+    );
 
     // 카테고리별 그룹화
     const byCategory = {
