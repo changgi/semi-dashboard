@@ -25,6 +25,7 @@ import { TradingSignalBoard } from "@/components/TradingSignalBoard";
 import { AgentDashboard } from "@/components/AgentDashboard";
 import { MacroPanel } from "@/components/MacroPanel";
 import { MacroCorrelation } from "@/components/MacroCorrelation";
+import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -231,6 +232,9 @@ export default function Dashboard() {
 
         {/* Final */}
         <div className="col-span-12"><ExecutiveSummary /></div>
+
+        {/* 💊 Data Health - 시스템 상태 모니터링 (최하단) */}
+        <div className="col-span-12"><DataHealthDashboard /></div>
       </div>
 
       {/* Footer */}

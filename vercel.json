@@ -5,6 +5,10 @@
       "schedule": "* * * * *"
     },
     {
+      "path": "/api/cron/fetch-macro",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/cron/check-alerts",
       "schedule": "*/5 * * * *"
     },
@@ -19,11 +23,23 @@
     {
       "path": "/api/cron/compute-signals",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-agents",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/compute-correlation",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/daily-rollup",
+      "schedule": "0 3 * * *"
     }
   ],
   "functions": {
     "app/api/cron/**": {
-      "maxDuration": 60
+      "maxDuration": 300
     }
   }
 }
