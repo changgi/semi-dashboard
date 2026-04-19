@@ -31,6 +31,8 @@ import { ForecastAccuracyPanel } from "@/components/ForecastAccuracyPanel";
 import { MacroCorrelation } from "@/components/MacroCorrelation";
 import { DerivativesPanel } from "@/components/DerivativesPanel";
 import { StockDerivativesPanel } from "@/components/StockDerivativesPanel";
+import { OptionsScannerPanel } from "@/components/OptionsScannerPanel";
+import { DailySummaryPanel } from "@/components/DailySummaryPanel";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -134,6 +136,9 @@ export default function Dashboard() {
       {/* ═══════════════ MAIN GRID ═══════════════ */}
       <div className="px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-12 gap-3 sm:gap-5">
 
+        {/* ⭐ TODAY'S VIEW - 오늘의 투자 종합 판단 (최상단 하이라이트) */}
+        <div className="col-span-12"><DailySummaryPanel /></div>
+
         {/* 01 · Heatmap (col-8) + 02 · Top Performer (col-4) */}
         <div className="col-span-12 lg:col-span-8">
           <Heatmap rows={rows} onSelect={handleSelect} />
@@ -220,6 +225,9 @@ export default function Dashboard() {
 
         {/* 💹 Stock Options & Derivatives - 종목별 실제 옵션 체인 + 관련 상품 */}
         <div className="col-span-12"><StockDerivativesPanel /></div>
+
+        {/* 🔍 Options Scanner - 전체 반도체 옵션 시장 한눈에 비교 */}
+        <div className="col-span-12"><OptionsScannerPanel /></div>
 
         {/* 🤖 AI Hedge Fund - 19 Agents Council */}
         <div className="col-span-12"><AgentDashboard /></div>

@@ -7,6 +7,36 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+// ═══════════════════════════════════════════════════════════
+// 메모리 캐시 (Lambda 컨테이너 생명주기 동안 유지)
+// 전체 분석 결과를 5분간 캐시 → 6.4초 → 0.1초
+// ═══════════════════════════════════════════════════════════
+interface CacheEntry {
+  data: unknown;
+  timestamp: number;
+}
+const CACHE = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5분
+
+function getCached(key: string): unknown | null {
+  const entry = CACHE.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    CACHE.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCached(key: string, data: unknown): void {
+  CACHE.set(key, { data, timestamp: Date.now() });
+  // 캐시 크기 제한 (최대 50개 키)
+  if (CACHE.size > 50) {
+    const oldest = [...CACHE.entries()].sort((a, b) => a[1].timestamp - b[1].timestamp)[0];
+    if (oldest) CACHE.delete(oldest[0]);
+  }
+}
+
 // ───────────────────────────────────────────────────────────────
 // 반도체 종목 Fundamentals (정적 데이터 - 최신 분기 기준)
 // 실제 운영에서는 Finnhub/Alpha Vantage 등에서 가져올 수 있음
@@ -51,6 +81,19 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const symbol = searchParams.get("symbol");
+    const noCache = searchParams.get("nocache") === "1";
+
+    // 캐시 체크 (심볼별로 분리 캐시)
+    const cacheKey = symbol ? `agent:${symbol.toUpperCase()}` : "agent:all";
+    if (!noCache) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        return NextResponse.json({
+          ...(cached as object),
+          _cache: "hit",
+        });
+      }
+    }
 
     const supabase = createAdmin();
 
@@ -168,12 +211,17 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const response = {
       success: true,
       count: results.length,
       macro, // 대시보드 표시용
       results,
-    });
+    };
+
+    // 캐시 저장
+    setCached(cacheKey, response);
+
+    return NextResponse.json({ ...response, _cache: "miss" });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ success: false, error: msg }, { status: 500 });
