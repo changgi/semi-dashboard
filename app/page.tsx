@@ -35,6 +35,7 @@ import { OptionsScannerPanel } from "@/components/OptionsScannerPanel";
 import { DailySummaryPanel } from "@/components/DailySummaryPanel";
 import { KoreaSemiPanel } from "@/components/KoreaSemiPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
+import { PortfolioPanel } from "@/components/PortfolioPanel";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -140,6 +141,9 @@ export default function Dashboard() {
 
         {/* ⭐ TODAY'S VIEW - 오늘의 투자 종합 판단 (최상단 하이라이트) */}
         <div className="col-span-12"><DailySummaryPanel /></div>
+
+        {/* 💼 MY PORTFOLIO - 사용자 보유 종목 실시간 추적 */}
+        <div className="col-span-12"><PortfolioPanel /></div>
 
         {/* 🇰🇷 KOREA SEMI - 한국 반도체 생태계 (한국 투자자 우선) */}
         <div className="col-span-12"><KoreaSemiPanel /></div>
