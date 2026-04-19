@@ -1,0 +1,18 @@
+{
+  "crons": [
+    { "path": "/api/cron/fetch-prices",         "schedule": "* * * * *" },
+    { "path": "/api/cron/fetch-macro",          "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/check-alerts",         "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/fetch-news",           "schedule": "*/15 * * * *" },
+    { "path": "/api/cron/compute-analysis",     "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/compute-signals",      "schedule": "*/10 * * * *" },
+    { "path": "/api/cron/snapshot-agents",      "schedule": "0 * * * *" },
+    { "path": "/api/cron/snapshot-forecasts",   "schedule": "0 2 * * *" },
+    { "path": "/api/cron/evaluate-forecasts",   "schedule": "30 2 * * *" },
+    { "path": "/api/cron/daily-rollup",         "schedule": "0 3 * * *" },
+    { "path": "/api/cron/compute-correlation",  "schedule": "0 4 * * *" }
+  ],
+  "functions": {
+    "app/api/cron/**": { "maxDuration": 300 }
+  }
+}
