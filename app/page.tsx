@@ -34,6 +34,7 @@ import { StockDerivativesPanel } from "@/components/StockDerivativesPanel";
 import { OptionsScannerPanel } from "@/components/OptionsScannerPanel";
 import { DailySummaryPanel } from "@/components/DailySummaryPanel";
 import { KoreaSemiPanel } from "@/components/KoreaSemiPanel";
+import { BacktestPanel } from "@/components/BacktestPanel";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -220,6 +221,9 @@ export default function Dashboard() {
 
         {/* 🎯 Forecast Accuracy - 예측 vs 실제 비교 (신뢰도 검증) */}
         <div className="col-span-12"><ForecastAccuracyPanel /></div>
+
+        {/* 🧪 Backtest - 과거 전략 검증 시뮬레이터 */}
+        <div className="col-span-12"><BacktestPanel /></div>
 
         {/* 🔗 Macro-Semi Correlation Matrix - 매크로-반도체 상관관계 히트맵 */}
         <div className="col-span-12"><MacroCorrelation /></div>
