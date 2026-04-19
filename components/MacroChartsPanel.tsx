@@ -208,12 +208,7 @@ function MacroChart({
               width={40}
             />
             <Tooltip
-              contentStyle={{
-                background: "#0a0a0a",
-                border: "1px solid #333",
-                fontSize: 10,
-                fontFamily: "JetBrains Mono",
-              }}
+              contentStyle={{ background: "rgba(20,20,20,0.95)", border: "1px solid var(--amber-dim)", borderRadius: "4px", fontSize: 11, padding: "8px 10px", boxShadow: "0 4px 16px rgba(0,0,0,0.6)" }} labelStyle={{ color: "var(--amber)", fontWeight: "bold", marginBottom: "4px" }} itemStyle={{ color: "#e0e0e0", padding: "1px 0" }}
               formatter={(value: number, name: string) => {
                 if (value === null) return [null, null];
                 if (name === "actual") return [value.toFixed(2), "실제값"];
@@ -222,7 +217,6 @@ function MacroChart({
                 if (name === "lower") return [value.toFixed(2), "80% 하단"];
                 return [value, name];
               }}
-              labelStyle={{ color: "#aaa" }}
             />
 
             {/* 평균값 기준선 */}

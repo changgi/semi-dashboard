@@ -224,11 +224,7 @@ export function TrendIntegration({ rows }: { rows: DashboardRow[] }) {
                                                                 width={50}
                                                               />
                                               <Tooltip
-                                                                contentStyle={{
-                                                                                    background: "#0a0a0a",
-                                                                                    border: "1px solid #333",
-                                                                                    fontSize: 10,
-                                                                }}
+                                                                contentStyle={{ background: "rgba(20,20,20,0.95)", border: "1px solid var(--amber-dim)", borderRadius: "4px", fontSize: 11, padding: "8px 10px", boxShadow: "0 4px 16px rgba(0,0,0,0.6)" }} labelStyle={{ color: "var(--amber)", fontWeight: "bold", marginBottom: "4px" }} itemStyle={{ color: "#e0e0e0", padding: "1px 0" }}
                                                                 labelFormatter={(v) =>
                                                                                     new Date(v as number).toLocaleString()
                                                                 }

@@ -196,7 +196,7 @@ export function HighDimensionAnalysis() {
                   <Radar key={r.symbol} name={r.symbol} dataKey={r.symbol}
                     stroke={COLORS[i]} fill={COLORS[i]} fillOpacity={0.08} strokeWidth={1.5} />
                 ))}
-                <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #333", fontSize: 10 }} />
+                <Tooltip contentStyle={{ background: "rgba(20,20,20,0.95)", border: "1px solid var(--amber-dim)", borderRadius: "4px", fontSize: 11, padding: "8px 10px", boxShadow: "0 4px 16px rgba(0,0,0,0.6)" }} labelStyle={{ color: "var(--amber)", fontWeight: "bold", marginBottom: "4px" }} itemStyle={{ color: "#e0e0e0", padding: "1px 0" }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -220,7 +220,7 @@ export function HighDimensionAnalysis() {
                     <CartesianGrid stroke="rgba(255,255,255,0.06)" horizontal={false} />
                     <XAxis type="number" tick={{ fill: "#888", fontSize: 9 }} />
                     <YAxis dataKey="symbol" type="category" tick={{ fill: "#ccc", fontSize: 10 }} width={45} />
-                    <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #333", fontSize: 10 }} />
+                    <Tooltip contentStyle={{ background: "rgba(20,20,20,0.95)", border: "1px solid var(--amber-dim)", borderRadius: "4px", fontSize: 11, padding: "8px 10px", boxShadow: "0 4px 16px rgba(0,0,0,0.6)" }} labelStyle={{ color: "var(--amber)", fontWeight: "bold", marginBottom: "4px" }} itemStyle={{ color: "#e0e0e0", padding: "1px 0" }} />
                     <Bar dataKey="price" fill="var(--amber)">
                       {items.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Bar>
@@ -257,7 +257,7 @@ export function HighDimensionAnalysis() {
                     />
                     <ZAxis dataKey="z" range={[60, 400]} />
                     <Tooltip
-                      contentStyle={{ background: "#0a0a0a", border: "1px solid #333", fontSize: 10 }}
+                      contentStyle={{ background: "rgba(20,20,20,0.95)", border: "1px solid var(--amber-dim)", borderRadius: "4px", fontSize: 11, padding: "8px 10px", boxShadow: "0 4px 16px rgba(0,0,0,0.6)" }} labelStyle={{ color: "var(--amber)", fontWeight: "bold", marginBottom: "4px" }} itemStyle={{ color: "#e0e0e0", padding: "1px 0" }}
                       formatter={(v: number, name: string) => {
                         if (name === "x") return [v.toFixed(2), xLabel];
                         if (name === "y") return [v.toFixed(2), yLabel];

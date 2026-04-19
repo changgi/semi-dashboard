@@ -29,6 +29,7 @@ import { MacroPanel } from "@/components/MacroPanel";
 import { MacroChartsPanel } from "@/components/MacroChartsPanel";
 import { ForecastAccuracyPanel } from "@/components/ForecastAccuracyPanel";
 import { MacroCorrelation } from "@/components/MacroCorrelation";
+import { DerivativesPanel } from "@/components/DerivativesPanel";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -212,6 +213,9 @@ export default function Dashboard() {
 
         {/* 🔗 Macro-Semi Correlation Matrix - 매크로-반도체 상관관계 히트맵 */}
         <div className="col-span-12"><MacroCorrelation /></div>
+
+        {/* 💱 FX · Futures · Options - 환율/선물/옵션 */}
+        <div className="col-span-12"><DerivativesPanel /></div>
 
         {/* 🤖 AI Hedge Fund - 19 Agents Council */}
         <div className="col-span-12"><AgentDashboard /></div>
