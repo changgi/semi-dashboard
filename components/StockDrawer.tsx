@@ -31,6 +31,15 @@ export function StockDrawer({
             <div className="flex items-center justify-between mb-2">
               <div className="section-title text-[10px]">{row.segment?.toUpperCase()}</div>
               <div className="flex gap-2">
+                <a
+                  href={`/stock/${encodeURIComponent(row.symbol)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2 sm:px-4 py-1.5 sm:py-2 border border-[var(--amber-dim)] text-[var(--amber)] text-[9px] sm:text-[11px] tracking-widest hover:bg-[var(--amber)] hover:text-black"
+                  title="전체 분석 페이지 열기"
+                >
+                  ◢ FULL PAGE
+                </a>
                 <button
                   onClick={() => setShowAlert(true)}
                   className="px-2 sm:px-4 py-1.5 sm:py-2 border border-[var(--amber)] text-[var(--amber)] text-[9px] sm:text-[11px] tracking-widest hover:bg-[var(--amber)] hover:text-black"

@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { SkeletonBar, SkeletonCards } from "./Skeleton";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -234,8 +235,20 @@ export function KoreaSemiPanel() {
 
   if (isLoading) {
     return (
-      <div className="panel p-3 sm:p-5 text-[10px] dim text-center kr">
-        한국 반도체 데이터 로딩 중...
+      <div className="panel p-3 sm:p-5">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <div className="section-title text-[10px] sm:text-[12px] opacity-60">
+              🇰🇷 KOREA SEMI WATCH · 로딩 중...
+            </div>
+            <SkeletonBar className="w-40 h-3 mt-1" />
+          </div>
+        </div>
+        <SkeletonCards count={4} />
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <SkeletonBar className="w-full h-24" />
+          <SkeletonBar className="w-full h-24" />
+        </div>
       </div>
     );
   }
@@ -243,7 +256,7 @@ export function KoreaSemiPanel() {
   if (!data?.success) {
     return (
       <div className="panel p-3 sm:p-5 text-[10px] dim text-center kr">
-        데이터 로딩 실패
+        ⚠️ 한국 반도체 데이터 로딩 실패 · 잠시 후 재시도
       </div>
     );
   }

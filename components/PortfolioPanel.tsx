@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
+import { SkeletonBar, SkeletonCards, SkeletonTable } from "./Skeleton";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -50,6 +51,45 @@ interface PortfolioData {
   }>;
 }
 
+// 합산 뷰 타입
+interface ConsolidatedPosition {
+  symbol: string;
+  name: string | null;
+  totalShares: number;
+  weightedAvgCost: number;
+  totalCost: number;
+  currentPrice: number | null;
+  marketValue: number;
+  gain: number;
+  gainPct: number;
+  gainUsd: number;
+  currency: string;
+  dayChangePct: number | null;
+  breakdown: Array<{
+    id: number;
+    shares: number;
+    avgCost: number;
+    purchaseDate: string | null;
+    notes: string | null;
+    gain: number;
+    gainPct: number;
+  }>;
+}
+
+interface ConsolidatedData {
+  success: boolean;
+  positions: ConsolidatedPosition[];
+  summary: {
+    totalValue: number;
+    totalCost: number;
+    totalGain: number;
+    totalGainPct: number;
+    positionCount: number;
+    rawHoldingCount: number;
+    usdKrwRate: number;
+  };
+}
+
 // ═══════════════════════════════════════════════════════════
 // 메인 컴포넌트
 // ═══════════════════════════════════════════════════════════
@@ -57,6 +97,16 @@ export function PortfolioPanel() {
   const { data, isLoading } = useSWR<PortfolioData>("/api/portfolio", fetcher, {
     refreshInterval: 60000, // 1분
   });
+
+  const [viewMode, setViewMode] = useState<"detail" | "consolidated">("detail");
+  const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
+
+  // 합산 뷰 데이터 (viewMode가 consolidated일 때만 fetch)
+  const { data: consolidatedData } = useSWR<ConsolidatedData>(
+    viewMode === "consolidated" ? "/api/portfolio-consolidated" : null,
+    fetcher,
+    { refreshInterval: 60000 }
+  );
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -95,15 +145,104 @@ export function PortfolioPanel() {
             실제 보유 종목 실시간 수익률 · USD/KRW 통합 평가 · 1분 자동 갱신
           </div>
         </div>
-        <button
-          onClick={() => {
-            setEditingId(null);
-            setShowAddForm(!showAddForm);
-          }}
-          className="px-3 py-1 text-[10px] border border-[var(--amber)] text-[var(--amber)] hover:bg-[rgba(255,176,0,0.1)]"
-        >
-          {showAddForm ? "✕ 취소" : "+ 종목 추가"}
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          {/* 뷰 모드 토글 */}
+          <div className="flex border border-[var(--border)] rounded overflow-hidden">
+            <button
+              onClick={() => setViewMode("detail")}
+              className={`px-2 py-1 text-[9px] kr transition-all ${
+                viewMode === "detail"
+                  ? "bg-[var(--amber)] text-[#111] font-bold"
+                  : "dim hover:bright"
+              }`}
+              title="각 거래를 개별로 표시"
+            >
+              📋 상세
+            </button>
+            <button
+              onClick={() => setViewMode("consolidated")}
+              className={`px-2 py-1 text-[9px] kr transition-all border-l border-[var(--border)] ${
+                viewMode === "consolidated"
+                  ? "bg-[var(--amber)] text-[#111] font-bold"
+                  : "dim hover:bright"
+              }`}
+              title="같은 종목을 가중평균 단가로 통합"
+            >
+              📊 합산
+            </button>
+          </div>
+          {/* 이름 갱신 버튼 (숨겨진 이름이 있을 때만 표시) */}
+          {data?.holdings?.some(
+            (h) => !h.name || h.name === h.symbol || /^\d+$/.test(h.name)
+          ) && (
+            <button
+              onClick={async () => {
+                if (!confirm("모든 종목의 이름을 Yahoo에서 자동 갱신하시겠습니까?")) return;
+                try {
+                  const res = await fetch(
+                    `/api/portfolio-refresh-names?key=4342162bb172cc95a241f19164e64b80`
+                  );
+
+                  // 미배포 감지 (404)
+                  if (res.status === 404) {
+                    const showSql = confirm(
+                      "⚠️ 이름 갱신 API가 아직 배포되지 않았습니다.\n\n" +
+                      "대신 Supabase SQL Editor에서 바로 실행할 SQL을 보시겠습니까?\n" +
+                      "(확인 누르면 클립보드에 복사됨)"
+                    );
+                    if (showSql) {
+                      const sql = `-- 🔧 포트폴리오 종목명 일괄 수정\nUPDATE portfolio_holdings\nSET name = CASE symbol\n  WHEN '360750.KS' THEN 'TIGER 미국S&P500'\n  WHEN '379800.KS' THEN 'KODEX 미국S&P500'\n  WHEN '381170.KS' THEN 'TIGER 미국테크TOP10'\n  WHEN '091160.KS' THEN 'KODEX 반도체'\n  WHEN '005930.KS' THEN '삼성전자'\n  WHEN '000660.KS' THEN 'SK하이닉스'\n  WHEN '042700.KS' THEN '한미반도체'\n  WHEN 'NVDA' THEN 'NVIDIA Corporation'\n  WHEN 'MU' THEN 'Micron Technology'\n  WHEN 'TSM' THEN 'TSMC'\n  WHEN 'AVGO' THEN 'Broadcom'\n  WHEN 'AMD' THEN 'AMD'\n  WHEN 'SMH' THEN 'VanEck Semi ETF'\n  WHEN 'SOXX' THEN 'iShares Semi ETF'\n  ELSE name\nEND,\nupdated_at = NOW()\nWHERE is_active = true\n  AND (name IS NULL OR name = symbol OR name ~ '^\\d+$');`;
+                      try {
+                        await navigator.clipboard.writeText(sql);
+                        alert(
+                          "✅ SQL이 클립보드에 복사됐습니다!\n\n" +
+                          "사용법:\n" +
+                          "1. Supabase Dashboard 열기\n" +
+                          "2. 좌측 메뉴 → SQL Editor\n" +
+                          "3. 붙여넣기 (Ctrl+V) → Run\n" +
+                          "4. 대시보드 새로고침"
+                        );
+                      } catch {
+                        alert("클립보드 복사 실패. 콘솔에서 SQL 확인 (F12)");
+                        console.log(sql);
+                      }
+                    }
+                    return;
+                  }
+
+                  const r = await res.json();
+                  if (r.success) {
+                    alert(
+                      `✅ ${r.applied}건 업데이트 완료!\n\n` +
+                      (r.updates
+                        .slice(0, 5)
+                        .map((u: { oldName: string; newName: string }) => `${u.oldName || '(비어있음)'} → ${u.newName}`)
+                        .join("\n") || "변경 없음")
+                    );
+                    mutate("/api/portfolio");
+                  } else {
+                    alert("실패: " + r.error);
+                  }
+                } catch (e) {
+                  alert("오류: " + String(e));
+                }
+              }}
+              className="px-3 py-1 text-[10px] border border-[#ff8888] text-[#ff8888] hover:bg-[rgba(255,136,136,0.1)]"
+              title="종목명이 없거나 잘못된 것을 Yahoo에서 자동으로 가져옵니다"
+            >
+              🔄 이름 갱신
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setEditingId(null);
+              setShowAddForm(!showAddForm);
+            }}
+            className="px-3 py-1 text-[10px] border border-[var(--amber)] text-[var(--amber)] hover:bg-[rgba(255,176,0,0.1)]"
+          >
+            {showAddForm ? "✕ 취소" : "+ 종목 추가"}
+          </button>
+        </div>
       </div>
 
       {/* 추가 폼 */}
@@ -120,7 +259,14 @@ export function PortfolioPanel() {
 
       {/* 로딩 */}
       {isLoading && (
-        <div className="text-[10px] dim py-6 text-center kr">포트폴리오 로딩 중...</div>
+        <div>
+          <SkeletonCards count={4} />
+          <div className="mt-3">
+            <SkeletonBar className="w-32 h-3 mb-2" />
+            <SkeletonBar className="w-full h-3 mb-3" />
+            <SkeletonTable cols={10} rows={3} />
+          </div>
+        </div>
       )}
 
       {/* 빈 상태 */}
@@ -228,7 +374,8 @@ export function PortfolioPanel() {
             </div>
           )}
 
-          {/* 종목 테이블 */}
+          {/* 종목 테이블 - 상세 뷰 */}
+          {viewMode === "detail" && (
           <div className="overflow-x-auto">
             <table className="w-full text-[9px] sm:text-[10px]">
               <thead>
@@ -247,11 +394,20 @@ export function PortfolioPanel() {
                 </tr>
               </thead>
               <tbody>
-                {data.holdings.map((h) => (
+                {data.holdings.map((h) => {
+                  // 이름이 의미 있는지 체크 (심볼과 같으면 무시)
+                  const hasGoodName = h.name && h.name !== h.symbol && !/^\d+$/.test(h.name);
+                  return (
                   <tr key={h.id} className="border-b border-[var(--border)] data-row">
                     <td className="py-1.5 px-2 tick font-bold">{h.symbol}</td>
-                    <td className="py-1.5 px-2 dim kr truncate max-w-[100px]">
-                      {h.name || "—"}
+                    <td className="py-1.5 px-2 kr truncate max-w-[120px]">
+                      {hasGoodName ? (
+                        <span className="dim">{h.name}</span>
+                      ) : (
+                        <span className="text-[#ff8888] text-[8px]" title="종목명이 없습니다. 마이그레이션 실행 또는 수정 후 Yahoo에서 자동 조회됩니다">
+                          ⚠ 이름 없음
+                        </span>
+                      )}
                     </td>
                     <td className="text-right py-1.5 px-2 dim">{h.shares}</td>
                     <td className="text-right py-1.5 px-2">
@@ -313,10 +469,174 @@ export function PortfolioPanel() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          )}
+
+          {/* 종목 테이블 - 합산 뷰 */}
+          {viewMode === "consolidated" && consolidatedData?.success && (
+            <div className="overflow-x-auto">
+              {/* 합산 요약 */}
+              <div className="mb-3 p-2 bg-[rgba(255,176,0,0.03)] border border-[var(--amber-dim)] rounded text-[9px] kr">
+                📊 <span className="bright">합산 뷰</span>: {consolidatedData.summary.rawHoldingCount}개 거래 → {consolidatedData.summary.positionCount}개 포지션으로 통합 · 같은 종목을 가중평균 단가로 계산
+              </div>
+
+              <table className="w-full text-[9px] sm:text-[10px]">
+                <thead>
+                  <tr className="border-b border-[var(--border)] dim">
+                    <th className="text-left py-1.5 px-2 w-5"></th>
+                    <th className="text-left py-1.5 px-2">심볼</th>
+                    <th className="text-left py-1.5 px-2 kr">종목명</th>
+                    <th className="text-right py-1.5 px-2 kr">총 수량</th>
+                    <th className="text-right py-1.5 px-2 kr">가중평균</th>
+                    <th className="text-right py-1.5 px-2 kr">현재가</th>
+                    <th className="text-right py-1.5 px-2 kr">일변동</th>
+                    <th className="text-right py-1.5 px-2 kr">평가액</th>
+                    <th className="text-right py-1.5 px-2 kr">손익</th>
+                    <th className="text-right py-1.5 px-2 kr">수익률</th>
+                    <th className="text-center py-1.5 px-2 kr">거래</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {consolidatedData.positions.map((p) => {
+                    const hasGoodName = p.name && p.name !== p.symbol && !/^\d+$/.test(p.name);
+                    const hasMultiple = p.breakdown.length > 1;
+                    const isExpanded = expandedSymbol === p.symbol;
+                    return (
+                      <>
+                        <tr
+                          key={p.symbol}
+                          className={`border-b border-[var(--border)] data-row ${
+                            hasMultiple ? "cursor-pointer hover:bg-[rgba(255,176,0,0.05)]" : ""
+                          }`}
+                          onClick={() => {
+                            if (hasMultiple) {
+                              setExpandedSymbol(isExpanded ? null : p.symbol);
+                            }
+                          }}
+                        >
+                          <td className="py-1.5 px-2 text-[var(--amber)] text-[10px]">
+                            {hasMultiple ? (isExpanded ? "▼" : "▶") : ""}
+                          </td>
+                          <td className="py-1.5 px-2 tick font-bold">{p.symbol}</td>
+                          <td className="py-1.5 px-2 kr truncate max-w-[140px]">
+                            {hasGoodName ? (
+                              <span className="dim">{p.name}</span>
+                            ) : (
+                              <span className="text-[#ff8888] text-[8px]">⚠ 이름 없음</span>
+                            )}
+                          </td>
+                          <td className="text-right py-1.5 px-2 tick">
+                            {p.totalShares}
+                            {hasMultiple && (
+                              <span className="text-[7px] dim ml-1">({p.breakdown.length}건)</span>
+                            )}
+                          </td>
+                          <td className="text-right py-1.5 px-2">
+                            {formatPrice(p.weightedAvgCost, p.currency)}
+                          </td>
+                          <td className="text-right py-1.5 px-2 tick">
+                            {p.currentPrice !== null ? formatPrice(p.currentPrice, p.currency) : "—"}
+                          </td>
+                          <td
+                            className={`text-right py-1.5 px-2 text-[9px] ${
+                              (p.dayChangePct ?? 0) >= 0 ? "up" : "down"
+                            }`}
+                          >
+                            {p.dayChangePct !== null ? (
+                              <>
+                                {p.dayChangePct >= 0 ? "+" : ""}
+                                {p.dayChangePct.toFixed(2)}%
+                              </>
+                            ) : "—"}
+                          </td>
+                          <td className="text-right py-1.5 px-2 tick font-bold">
+                            {formatPrice(p.marketValue, p.currency)}
+                          </td>
+                          <td
+                            className={`text-right py-1.5 px-2 ${
+                              p.gain >= 0 ? "up" : "down"
+                            }`}
+                          >
+                            {p.gain >= 0 ? "+" : ""}
+                            {formatPrice(Math.abs(p.gain), p.currency).replace("$", p.gain >= 0 ? "+$" : "-$").replace("₩", p.gain >= 0 ? "+₩" : "-₩")}
+                          </td>
+                          <td
+                            className={`text-right py-1.5 px-2 font-bold ${
+                              p.gainPct >= 0 ? "up" : "down"
+                            }`}
+                          >
+                            {p.gainPct >= 0 ? "+" : ""}
+                            {p.gainPct.toFixed(2)}%
+                          </td>
+                          <td className="text-center py-1.5 px-2 dim text-[8px]">
+                            {p.breakdown.length}
+                          </td>
+                        </tr>
+                        {/* 확장 시 거래 이력 표시 */}
+                        {isExpanded && hasMultiple && (
+                          <tr className="bg-[rgba(0,0,0,0.3)]">
+                            <td colSpan={11} className="px-3 py-2">
+                              <div className="text-[9px] tick font-bold kr mb-1.5">
+                                📜 거래 이력 ({p.breakdown.length}건)
+                              </div>
+                              <table className="w-full text-[9px]">
+                                <thead>
+                                  <tr className="dim text-[8px]">
+                                    <th className="text-left py-1 kr">매수일</th>
+                                    <th className="text-right py-1 kr">수량</th>
+                                    <th className="text-right py-1 kr">단가</th>
+                                    <th className="text-right py-1 kr">평가변동</th>
+                                    <th className="text-right py-1 kr">수익률</th>
+                                    <th className="text-left py-1 kr pl-3">메모</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {p.breakdown.map((b) => (
+                                    <tr key={b.id} className="border-t border-[var(--border)]">
+                                      <td className="py-1 dim kr">
+                                        {b.purchaseDate || "—"}
+                                      </td>
+                                      <td className="text-right py-1">{b.shares}</td>
+                                      <td className="text-right py-1">
+                                        {formatPrice(b.avgCost, p.currency)}
+                                      </td>
+                                      <td
+                                        className={`text-right py-1 ${
+                                          b.gain >= 0 ? "up" : "down"
+                                        }`}
+                                      >
+                                        {b.gain >= 0 ? "+" : ""}
+                                        {formatPrice(Math.abs(b.gain), p.currency).replace("$", b.gain >= 0 ? "+$" : "-$").replace("₩", b.gain >= 0 ? "+₩" : "-₩")}
+                                      </td>
+                                      <td
+                                        className={`text-right py-1 font-bold ${
+                                          b.gainPct >= 0 ? "up" : "down"
+                                        }`}
+                                      >
+                                        {b.gainPct >= 0 ? "+" : ""}
+                                        {b.gainPct.toFixed(2)}%
+                                      </td>
+                                      <td className="py-1 dim text-[8px] kr pl-3 truncate max-w-[200px]">
+                                        {b.notes || "—"}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* 해석 */}
           <div className="mt-3 pt-3 border-t border-[var(--border)] text-[8px] dim kr leading-relaxed">
@@ -374,6 +694,12 @@ function AddHoldingForm({
       });
       const r = await res.json();
       if (r.success) {
+        // 심볼이 자동 보정된 경우 알림
+        if (r.symbolNormalized && r.holding?.symbol) {
+          alert(
+            `✅ 추가 완료!\n\n입력: ${symbol}\n자동 보정: ${r.holding.symbol}\n\n${r.normalizationReason || ""}`
+          );
+        }
         onSuccess();
       } else {
         alert("실패: " + r.error);
@@ -385,15 +711,37 @@ function AddHoldingForm({
     }
   };
 
+  // 심볼 자동 추정 (입력 중 실시간 경고)
+  const symbolWarning = (() => {
+    const upper = symbol.toUpperCase().trim();
+    if (!upper) return null;
+    if (upper.includes(".") || upper.startsWith("^")) return null;
+    if (currency === "KRW" && /^\d{6}$/.test(upper)) {
+      return { type: "info", msg: `→ 자동 보정: ${upper}.KS (한국 KOSPI)` };
+    }
+    if (currency === "USD" && /^\d+$/.test(upper)) {
+      return { type: "warning", msg: "⚠️ 숫자만 있는 심볼이 USD로 설정됐어요. 한국 종목이면 통화를 KRW로 변경하세요" };
+    }
+    return null;
+  })();
+
   // 빠른 추천 종목
   const quickSymbols = [
+    // 미국 반도체
     { sym: "NVDA", name: "NVIDIA", cur: "USD" },
     { sym: "TSM", name: "TSMC", cur: "USD" },
     { sym: "MU", name: "Micron", cur: "USD" },
     { sym: "AVGO", name: "Broadcom", cur: "USD" },
+    { sym: "SMH", name: "SMH ETF", cur: "USD" },
+    // 한국 주요
     { sym: "005930.KS", name: "삼성전자", cur: "KRW" },
     { sym: "000660.KS", name: "SK하이닉스", cur: "KRW" },
     { sym: "042700.KS", name: "한미반도체", cur: "KRW" },
+    // 한국 인기 ETF
+    { sym: "360750.KS", name: "TIGER 미국S&P500", cur: "KRW" },
+    { sym: "379800.KS", name: "KODEX 미국S&P500", cur: "KRW" },
+    { sym: "091170.KS", name: "KODEX 반도체", cur: "KRW" },
+    { sym: "381170.KS", name: "TIGER 미국테크TOP10", cur: "KRW" },
   ];
 
   return (
@@ -432,8 +780,23 @@ function AddHoldingForm({
             value={symbol}
             onChange={(e) => setSymbol(e.target.value.toUpperCase())}
             placeholder="NVDA, 005930.KS"
-            className="w-full bg-[var(--bg)] border border-[var(--border)] text-[var(--amber)] px-2 py-1 text-[10px]"
+            className={`w-full bg-[var(--bg)] border px-2 py-1 text-[10px] ${
+              symbolWarning?.type === "warning"
+                ? "border-[#ff3860] text-[#ff3860]"
+                : symbolWarning?.type === "info"
+                ? "border-[#00ff88] text-[#00ff88]"
+                : "border-[var(--border)] text-[var(--amber)]"
+            }`}
           />
+          {symbolWarning && (
+            <div
+              className={`text-[8px] mt-0.5 kr leading-tight ${
+                symbolWarning.type === "warning" ? "text-[#ff3860]" : "text-[#00ff88]"
+              }`}
+            >
+              {symbolWarning.msg}
+            </div>
+          )}
         </div>
         <div>
           <label className="text-[8px] dim kr">종목명 (선택)</label>

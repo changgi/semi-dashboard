@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { SkeletonBar, SkeletonCards } from "./Skeleton";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -74,8 +75,21 @@ export function DailySummaryPanel() {
 
   if (isLoading) {
     return (
-      <div className="panel p-4 text-[10px] dim text-center kr">
-        오늘의 종합 판단 분석 중...
+      <div className="panel p-3 sm:p-5">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <div className="section-title text-[11px] sm:text-[13px] opacity-60">
+              🎯 TODAY&apos;S INVESTMENT VIEW · 로딩 중...
+            </div>
+            <SkeletonBar className="w-48 h-3 mt-1" />
+          </div>
+          <SkeletonBar className="w-20 h-10" />
+        </div>
+        <SkeletonCards count={4} />
+        <div className="mt-3 space-y-2">
+          <SkeletonBar className="w-full h-12" />
+          <SkeletonBar className="w-full h-12" />
+        </div>
       </div>
     );
   }
@@ -83,7 +97,7 @@ export function DailySummaryPanel() {
   if (!data?.success) {
     return (
       <div className="panel p-4 text-[10px] dim text-center kr">
-        요약 데이터 로딩 실패
+        ⚠️ 요약 데이터 로딩 실패 · 잠시 후 자동 재시도
       </div>
     );
   }
@@ -107,13 +121,25 @@ export function DailySummaryPanel() {
             Daniel Yoo 프레임워크 + 19 AI 에이전트 + 실시간 매크로 · 5분 자동 갱신
           </div>
         </div>
-        <div className="text-right">
-          <div className={`text-[24px] sm:text-[36px] font-bold ${overallColorClass} leading-none`}>
-            {data.healthScore}
-            <span className="text-[14px] dim font-normal">/100</span>
-          </div>
-          <div className={`text-[9px] sm:text-[10px] font-bold kr ${overallColorClass}`}>
-            {data.overallView}
+        <div className="flex items-center gap-3">
+          {/* 📄 리포트 버튼 */}
+          <a
+            href="/report"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 text-[10px] border border-[var(--amber-dim)] text-[var(--amber)] hover:bg-[rgba(255,176,0,0.1)] hover:border-[var(--amber)] transition-colors font-bold"
+            title="일일 브리핑 리포트 (PDF 저장 가능)"
+          >
+            📄 일일 리포트
+          </a>
+          <div className="text-right">
+            <div className={`text-[24px] sm:text-[36px] font-bold ${overallColorClass} leading-none`}>
+              {data.healthScore}
+              <span className="text-[14px] dim font-normal">/100</span>
+            </div>
+            <div className={`text-[9px] sm:text-[10px] font-bold kr ${overallColorClass}`}>
+              {data.overallView}
+            </div>
           </div>
         </div>
       </div>

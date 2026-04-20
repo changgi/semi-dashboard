@@ -36,6 +36,17 @@ import { DailySummaryPanel } from "@/components/DailySummaryPanel";
 import { KoreaSemiPanel } from "@/components/KoreaSemiPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
 import { PortfolioPanel } from "@/components/PortfolioPanel";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { InvestmentAdvisor } from "@/components/InvestmentAdvisor";
+import { GlobalStockSearch } from "@/components/GlobalStockSearch";
+import { SideNavigation } from "@/components/SideNavigation";
+import { DashboardSettings } from "@/components/DashboardSettings";
+import { SectionWrapper } from "@/components/SectionWrapper";
+import { PriceAlertsPanel } from "@/components/PriceAlertsPanel";
+import { OptionsImpactPanel } from "@/components/OptionsImpactPanel";
+import { OpExCalendarPanel } from "@/components/OpExCalendarPanel";
+import { HotActionsBar } from "@/components/HotActionsBar";
+import { PanelErrorBoundary } from "@/components/PanelErrorBoundary";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -91,6 +102,7 @@ export default function Dashboard() {
   return (
     <div className="relative z-10">
       <TopBar isConnected={isConnected} />
+      <HotActionsBar />
       <LiveTicker rows={rows} />
 
       {/* ═══════════════ HERO ═══════════════ */}
@@ -140,13 +152,39 @@ export default function Dashboard() {
       <div className="px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-12 gap-3 sm:gap-5">
 
         {/* ⭐ TODAY'S VIEW - 오늘의 투자 종합 판단 (최상단 하이라이트) */}
-        <div className="col-span-12"><DailySummaryPanel /></div>
+        <div id="today-view" className="col-span-12">
+          <PanelErrorBoundary panelName="Today's View">
+            <DailySummaryPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🧠 INVESTMENT ADVISOR - 오늘 할 일 구체적 가이드 */}
+        <SectionWrapper id="advisor">
+          <PanelErrorBoundary panelName="Investment Advisor">
+            <InvestmentAdvisor />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 💼 MY PORTFOLIO - 사용자 보유 종목 실시간 추적 */}
-        <div className="col-span-12"><PortfolioPanel /></div>
+        <SectionWrapper id="portfolio">
+          <PanelErrorBoundary panelName="포트폴리오">
+            <PortfolioPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
+
+        {/* 🔔 PRICE ALERTS - 가격 알림 */}
+        <div id="price-alerts" className="col-span-12">
+          <PanelErrorBoundary panelName="Price Alerts">
+            <PriceAlertsPanel />
+          </PanelErrorBoundary>
+        </div>
 
         {/* 🇰🇷 KOREA SEMI - 한국 반도체 생태계 (한국 투자자 우선) */}
-        <div className="col-span-12"><KoreaSemiPanel /></div>
+        <SectionWrapper id="korea-semi">
+          <PanelErrorBoundary panelName="Korea Semi Watch">
+            <KoreaSemiPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 01 · Heatmap (col-8) + 02 · Top Performer (col-4) */}
         <div className="col-span-12 lg:col-span-8">
@@ -218,34 +256,88 @@ export default function Dashboard() {
         {/* === ADVANCED ANALYTICS === */}
 
         {/* 🌍 Macro Dashboard - 반도체 매크로 환경 (원유/국채/VIX/달러/한국) */}
-        <div className="col-span-12"><MacroPanel /></div>
+        <SectionWrapper id="macro">
+          <PanelErrorBoundary panelName="Macro Dashboard">
+            <MacroPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 📈 Macro Charts - 히스토리 + 전망 차트 */}
-        <div className="col-span-12"><MacroChartsPanel /></div>
+        <SectionWrapper id="macro-charts">
+          <PanelErrorBoundary panelName="Macro Charts">
+            <MacroChartsPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 🎯 Forecast Accuracy - 예측 vs 실제 비교 (신뢰도 검증) */}
-        <div className="col-span-12"><ForecastAccuracyPanel /></div>
+        <SectionWrapper id="forecast-accuracy">
+          <PanelErrorBoundary panelName="Forecast Accuracy">
+            <ForecastAccuracyPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 🧪 Backtest - 과거 전략 검증 시뮬레이터 */}
-        <div className="col-span-12"><BacktestPanel /></div>
+        <SectionWrapper id="backtest">
+          <PanelErrorBoundary panelName="Backtest">
+            <BacktestPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 🔗 Macro-Semi Correlation Matrix - 매크로-반도체 상관관계 히트맵 */}
-        <div className="col-span-12"><MacroCorrelation /></div>
+        <SectionWrapper id="correlation">
+          <PanelErrorBoundary panelName="Correlation Matrix">
+            <MacroCorrelation />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 💱 FX · Futures · Options - 환율/선물/옵션 (매크로) */}
-        <div className="col-span-12"><DerivativesPanel /></div>
+        <SectionWrapper id="derivatives">
+          <PanelErrorBoundary panelName="FX/Futures/Options">
+            <DerivativesPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 💹 Stock Options & Derivatives - 종목별 실제 옵션 체인 + 관련 상품 */}
-        <div className="col-span-12"><StockDerivativesPanel /></div>
+        <SectionWrapper id="stock-options">
+          <PanelErrorBoundary panelName="Stock Options">
+            <StockDerivativesPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
+
+        {/* 📅 OpEx Calendar - 옵션 만기 캘린더 + 매매 타이밍 */}
+        <div id="opex-calendar" className="col-span-12">
+          <PanelErrorBoundary panelName="OpEx Calendar">
+            <OpExCalendarPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🎯 Options Impact - 옵션이 현물에 미칠 영향 예측 */}
+        <div id="options-impact" className="col-span-12">
+          <PanelErrorBoundary panelName="Options Impact">
+            <OptionsImpactPanel />
+          </PanelErrorBoundary>
+        </div>
 
         {/* 🔍 Options Scanner - 전체 반도체 옵션 시장 한눈에 비교 */}
-        <div className="col-span-12"><OptionsScannerPanel /></div>
+        <SectionWrapper id="options-scanner">
+          <PanelErrorBoundary panelName="Options Scanner">
+            <OptionsScannerPanel />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 🤖 AI Hedge Fund - 19 Agents Council */}
-        <div className="col-span-12"><AgentDashboard /></div>
+        <SectionWrapper id="agents">
+          <PanelErrorBoundary panelName="AI Agents">
+            <AgentDashboard />
+          </PanelErrorBoundary>
+        </SectionWrapper>
 
         {/* 📊 AGENT COMPARISON - 여러 종목 비교표 */}
-        <div className="col-span-12"><AgentComparisonTable /></div>
+        <div className="col-span-12">
+          <PanelErrorBoundary panelName="Agent Comparison">
+            <AgentComparisonTable />
+          </PanelErrorBoundary>
+        </div>
 
         {/* 🔬 AGENT DETAIL - 종목 상세 표 */}
         <div className="col-span-12"><AgentDetailTable /></div>
@@ -301,6 +393,18 @@ export default function Dashboard() {
       {selectedRow && (
         <StockDrawer row={selectedRow} onClose={() => setSelectedSymbol(null)} />
       )}
+
+      {/* 🔔 알림 센터 - 우측 하단 고정 플로팅 */}
+      <NotificationCenter />
+
+      {/* 🔍 글로벌 종목 검색 - Ctrl+K 단축키 */}
+      <GlobalStockSearch />
+
+      {/* 📍 사이드 네비 - 우측 중앙 섹션 점프 */}
+      <SideNavigation />
+
+      {/* ⚙️ 대시보드 설정 - 좌측 하단 */}
+      <DashboardSettings />
     </div>
   );
 }

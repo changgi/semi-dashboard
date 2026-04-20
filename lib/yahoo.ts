@@ -149,3 +149,66 @@ export async function fetchYahooQuotes(
   });
   return map;
 }
+
+// ═══════════════════════════════════════════════════════════
+// 종목명 조회 (Chart API meta 기반)
+// ═══════════════════════════════════════════════════════════
+
+export interface YahooSymbolInfo {
+  symbol: string;
+  shortName: string | null;
+  longName: string | null;
+  exchangeName: string | null;
+  currency: string | null;
+  instrumentType: string | null;
+}
+
+/**
+ * 단일 심볼의 이름/거래소/통화 정보 조회
+ */
+export async function fetchYahooSymbolInfo(
+  symbol: string
+): Promise<YahooSymbolInfo | null> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=1d`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+          "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta) return null;
+
+    return {
+      symbol: meta.symbol ?? symbol,
+      shortName: meta.shortName ?? null,
+      longName: meta.longName ?? null,
+      exchangeName: meta.exchangeName ?? null,
+      currency: meta.currency ?? null,
+      instrumentType: meta.instrumentType ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 여러 심볼 동시 이름 조회
+ */
+export async function fetchYahooSymbolInfos(
+  symbols: string[]
+): Promise<Map<string, YahooSymbolInfo>> {
+  const results = await Promise.all(symbols.map((s) => fetchYahooSymbolInfo(s)));
+  const map = new Map<string, YahooSymbolInfo>();
+  results.forEach((info, i) => {
+    if (info) map.set(symbols[i], info);
+  });
+  return map;
+}
