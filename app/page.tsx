@@ -63,6 +63,7 @@ import { PushNotifications } from "@/components/PushNotifications";
 import { StrategyAssistantPanel } from "@/components/StrategyAssistantPanel";
 import { WeeklyStrategyPanel } from "@/components/WeeklyStrategyPanel";
 import { OrderSlipPanel } from "@/components/OrderSlipPanel";
+import { KoreaLensPanel } from "@/components/KoreaLensPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -206,6 +207,13 @@ export default function Dashboard() {
         <div id="order-slip" className="col-span-12">
           <PanelErrorBoundary panelName="Order Slip">
             <OrderSlipPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🇰🇷 KOREA LENS - 한국 투자자 맞춤 */}
+        <div id="korea-lens" className="col-span-12">
+          <PanelErrorBoundary panelName="Korea Lens">
+            <KoreaLensPanel />
           </PanelErrorBoundary>
         </div>
 

@@ -10,6 +10,7 @@ const SECTIONS = [
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
   { id: "weekly-strategy",  icon: "📅", label: "주간 전략",        group: "daily" },
   { id: "order-slip",       icon: "📝", label: "주문서",           group: "daily" },
+  { id: "korea-lens",       icon: "🇰🇷", label: "Korea Lens",       group: "daily" },
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },
