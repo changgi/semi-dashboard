@@ -10,7 +10,8 @@
     { "path": "/api/cron/snapshot-forecasts",   "schedule": "0 2 * * *" },
     { "path": "/api/cron/evaluate-forecasts",   "schedule": "30 2 * * *" },
     { "path": "/api/cron/daily-rollup",         "schedule": "0 3 * * *" },
-    { "path": "/api/cron/compute-correlation",  "schedule": "0 4 * * *" }
+    { "path": "/api/cron/compute-correlation",  "schedule": "0 4 * * *" },
+    { "path": "/api/cron/daily-alerts",         "schedule": "0 0 * * *" }
   ],
   "functions": {
     "app/api/cron/**": { "maxDuration": 300 }

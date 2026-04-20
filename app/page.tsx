@@ -50,6 +50,7 @@ import { UnifiedInsightChart } from "@/components/UnifiedInsightChart";
 import { PortfolioRiskPanel } from "@/components/PortfolioRiskPanel";
 import { DailyBriefingPanel } from "@/components/DailyBriefingPanel";
 import { SectorScannerPanel } from "@/components/SectorScannerPanel";
+import { AlertFeedPanel } from "@/components/AlertFeedPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -163,6 +164,13 @@ export default function Dashboard() {
         <div id="daily-briefing" className="col-span-12">
           <PanelErrorBoundary panelName="Daily Briefing">
             <DailyBriefingPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔔 ALERT FEED - 실시간 통합 알림 피드 */}
+        <div id="alert-feed" className="col-span-12">
+          <PanelErrorBoundary panelName="Alert Feed">
+            <AlertFeedPanel />
           </PanelErrorBoundary>
         </div>
 
