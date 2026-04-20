@@ -65,6 +65,8 @@ import { WeeklyStrategyPanel } from "@/components/WeeklyStrategyPanel";
 import { OrderSlipPanel } from "@/components/OrderSlipPanel";
 import { KoreaLensPanel } from "@/components/KoreaLensPanel";
 import { MorningBriefPanel } from "@/components/MorningBriefPanel";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -569,6 +571,12 @@ export default function Dashboard() {
 
       {/* 🔔 푸시 알림 - 우하단 플로팅 버튼 */}
       <PushNotifications />
+
+      {/* 📱 PWA 설치 안내 - 모바일 */}
+      <PWAInstallPrompt />
+
+      {/* ⚙️ Service Worker 등록 - PWA 활성화 */}
+      <ServiceWorkerRegister />
     </div>
   );
 }

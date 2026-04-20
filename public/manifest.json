@@ -1,0 +1,45 @@
+{
+  "name": "Kyle's Semi Investment Terminal",
+  "short_name": "Semi Terminal",
+  "description": "Real-time semiconductor sector dashboard with AI position guide",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0a0e0a",
+  "background_color": "#0a0e0a",
+  "scope": "/",
+  "lang": "ko",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%230a0e0a'/%3E%3Ctext y='75%25' x='50%25' text-anchor='middle' font-size='140' fill='%23ffb000'%3E%E2%97%A2%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230a0e0a'/%3E%3Ctext y='75%25' x='50%25' text-anchor='middle' font-size='380' fill='%23ffb000'%3E%E2%97%A2%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Morning Brief",
+      "short_name": "Brief",
+      "description": "오늘 3분 요약",
+      "url": "/#morning-brief"
+    },
+    {
+      "name": "Position Guide",
+      "short_name": "Guide",
+      "description": "AI 포지션 가이드",
+      "url": "/#position-guide"
+    },
+    {
+      "name": "Order Slip",
+      "short_name": "Orders",
+      "description": "실행 주문서",
+      "url": "/#order-slip"
+    }
+  ]
+}
