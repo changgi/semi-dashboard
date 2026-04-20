@@ -48,6 +48,10 @@ import { OpExCalendarPanel } from "@/components/OpExCalendarPanel";
 import { GammaProfilePanel } from "@/components/GammaProfilePanel";
 import { UnifiedInsightChart } from "@/components/UnifiedInsightChart";
 import { PortfolioRiskPanel } from "@/components/PortfolioRiskPanel";
+import { DailyBriefingPanel } from "@/components/DailyBriefingPanel";
+import { SectorScannerPanel } from "@/components/SectorScannerPanel";
+import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
+import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
 import { PanelErrorBoundary } from "@/components/PanelErrorBoundary";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
@@ -105,6 +109,7 @@ export default function Dashboard() {
   return (
     <div className="relative z-10">
       <TopBar isConnected={isConnected} />
+      <RecommendationTicker />
       <HotActionsBar />
       <LiveTicker rows={rows} />
 
@@ -154,6 +159,13 @@ export default function Dashboard() {
       {/* ═══════════════ MAIN GRID ═══════════════ */}
       <div className="px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-12 gap-3 sm:gap-5">
 
+        {/* ☕ MORNING BRIEFING - 매일 아침 5분 종합 브리핑 (최상단) */}
+        <div id="daily-briefing" className="col-span-12">
+          <PanelErrorBoundary panelName="Daily Briefing">
+            <DailyBriefingPanel />
+          </PanelErrorBoundary>
+        </div>
+
         {/* ⭐ TODAY'S VIEW - 오늘의 투자 종합 판단 (최상단 하이라이트) */}
         <div id="today-view" className="col-span-12">
           <PanelErrorBoundary panelName="Today's View">
@@ -186,6 +198,13 @@ export default function Dashboard() {
         <div id="unified-insight" className="col-span-12">
           <PanelErrorBoundary panelName="Unified Insight">
             <UnifiedInsightChart />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔍 SECTOR SCANNER - 섹터 전체 기회/경고 자동 발굴 */}
+        <div id="sector-scanner" className="col-span-12">
+          <PanelErrorBoundary panelName="Sector Scanner">
+            <SectorScannerPanel />
           </PanelErrorBoundary>
         </div>
 
@@ -429,6 +448,9 @@ export default function Dashboard() {
 
       {/* ⚙️ 대시보드 설정 - 좌측 하단 */}
       <DashboardSettings />
+
+      {/* 🎯 플로팅 결정 바 - 하단 항상 표시 */}
+      <FloatingDecisionBar />
     </div>
   );
 }
