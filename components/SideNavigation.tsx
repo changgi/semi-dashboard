@@ -6,9 +6,11 @@ import { useState, useEffect } from "react";
 // 섹션 정의 (page.tsx의 id와 매칭)
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
+  { id: "unified-insight",  icon: "🎯", label: "통합 인사이트",    group: "daily" },
   { id: "today-view",       icon: "🎯", label: "오늘의 View",     group: "daily" },
   { id: "advisor",          icon: "🧠", label: "Advisor",        group: "daily" },
   { id: "portfolio",        icon: "💼", label: "포트폴리오",       group: "daily" },
+  { id: "portfolio-risk",   icon: "🎯", label: "포트폴리오 리스크", group: "daily" },
   { id: "price-alerts",     icon: "🔔", label: "가격 알림",        group: "daily" },
   { id: "korea-semi",       icon: "🇰🇷", label: "Korea Semi",     group: "daily" },
   { id: "macro",            icon: "🌍", label: "매크로",          group: "analysis" },
@@ -20,6 +22,7 @@ const SECTIONS = [
   { id: "stock-options",    icon: "💹", label: "종목 옵션",        group: "options" },
   { id: "opex-calendar",    icon: "📅", label: "만기 캘린더",      group: "options" },
   { id: "options-impact",   icon: "🎯", label: "옵션 임팩트",      group: "options" },
+  { id: "gamma-profile",    icon: "📐", label: "감마 프로파일",    group: "options" },
   { id: "options-scanner",  icon: "🔍", label: "옵션 스캐너",      group: "options" },
   { id: "agents",           icon: "🤖", label: "AI 에이전트",      group: "ai" },
 ];

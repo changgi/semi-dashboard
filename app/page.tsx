@@ -45,6 +45,9 @@ import { SectionWrapper } from "@/components/SectionWrapper";
 import { PriceAlertsPanel } from "@/components/PriceAlertsPanel";
 import { OptionsImpactPanel } from "@/components/OptionsImpactPanel";
 import { OpExCalendarPanel } from "@/components/OpExCalendarPanel";
+import { GammaProfilePanel } from "@/components/GammaProfilePanel";
+import { UnifiedInsightChart } from "@/components/UnifiedInsightChart";
+import { PortfolioRiskPanel } from "@/components/PortfolioRiskPanel";
 import { HotActionsBar } from "@/components/HotActionsBar";
 import { PanelErrorBoundary } from "@/components/PanelErrorBoundary";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
@@ -171,6 +174,20 @@ export default function Dashboard() {
             <PortfolioPanel />
           </PanelErrorBoundary>
         </SectionWrapper>
+
+        {/* 🎯 PORTFOLIO RISK - 내 포트폴리오 통합 리스크 분석 */}
+        <div id="portfolio-risk" className="col-span-12">
+          <PanelErrorBoundary panelName="Portfolio Risk">
+            <PortfolioRiskPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🎯 UNIFIED INSIGHT - 통합 매매 결정 차트 (핵심!) */}
+        <div id="unified-insight" className="col-span-12">
+          <PanelErrorBoundary panelName="Unified Insight">
+            <UnifiedInsightChart />
+          </PanelErrorBoundary>
+        </div>
 
         {/* 🔔 PRICE ALERTS - 가격 알림 */}
         <div id="price-alerts" className="col-span-12">
@@ -315,6 +332,13 @@ export default function Dashboard() {
         <div id="options-impact" className="col-span-12">
           <PanelErrorBoundary panelName="Options Impact">
             <OptionsImpactPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📐 Gamma Profile - 가격대별 감마 분포 + Flip Level */}
+        <div id="gamma-profile" className="col-span-12">
+          <PanelErrorBoundary panelName="Gamma Profile">
+            <GammaProfilePanel />
           </PanelErrorBoundary>
         </div>
 
