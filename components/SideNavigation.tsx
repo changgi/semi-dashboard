@@ -10,6 +10,7 @@ const SECTIONS = [
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },
   { id: "economic-calendar",icon: "📅", label: "경제 캘린더",      group: "daily" },
+  { id: "earnings-monitor", icon: "📊", label: "실적 모니터",      group: "daily" },
   { id: "journal",          icon: "📔", label: "투자 일지",        group: "daily" },
   { id: "simulator",        icon: "🎮", label: "시뮬레이터",       group: "daily" },
   { id: "toolbox",          icon: "🛠️", label: "툴박스",           group: "daily" },

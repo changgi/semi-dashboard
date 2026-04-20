@@ -57,6 +57,7 @@ import { EconomicCalendarPanel } from "@/components/EconomicCalendarPanel";
 import { SimulatorPanel } from "@/components/SimulatorPanel";
 import { ToolboxPanel } from "@/components/ToolboxPanel";
 import { UrgentEventBanner } from "@/components/UrgentEventBanner";
+import { EarningsMonitorPanel } from "@/components/EarningsMonitorPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -200,6 +201,13 @@ export default function Dashboard() {
         <div id="economic-calendar" className="col-span-12">
           <PanelErrorBoundary panelName="Economic Calendar">
             <EconomicCalendarPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📊 EARNINGS MONITOR - 실적 발표 대응 전략 */}
+        <div id="earnings-monitor" className="col-span-12">
+          <PanelErrorBoundary panelName="Earnings Monitor">
+            <EarningsMonitorPanel />
           </PanelErrorBoundary>
         </div>
 
