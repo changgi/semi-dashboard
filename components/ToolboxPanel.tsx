@@ -189,9 +189,27 @@ function NewsSentimentTab() {
                     {n.score > 0 ? "+" : ""}{n.score}
                   </span>
                 </div>
+                {n.description && (
+                  <div className="text-[9px] dim kr mt-1 leading-relaxed line-clamp-2">
+                    {n.description}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mt-2 text-[8px] dim kr flex-wrap">
+                  {n.source && (
+                    <span className="px-1.5 py-0.5 border border-[var(--border-bright)] tick rounded">
+                      📰 {n.source}
+                    </span>
+                  )}
+                  {n.relativeTime && (
+                    <span className="tick font-bold">🕐 {n.relativeTime}</span>
+                  )}
+                  {n.pubDateKST && (
+                    <span title="한국 시간">{n.pubDateKST}</span>
+                  )}
+                </div>
                 {n.keywords && (n.keywords ?? []).length > 0 && (
-                  <div className="text-[8px] dim mt-1">
-                    키워드: {(n.keywords ?? []).slice(0, 3).join(", ")}
+                  <div className="text-[8px] dim mt-1.5">
+                    🔑 키워드: {(n.keywords ?? []).slice(0, 3).join(", ")}
                   </div>
                 )}
               </div>
@@ -201,7 +219,7 @@ function NewsSentimentTab() {
       )}
 
       <div className="text-[8px] dim kr pt-2 border-t border-[var(--border)]">
-        💡 Yahoo Finance 뉴스 자동 수집 · 키워드 기반 감정 분석 · 15분마다 자동 갱신
+        💡 Yahoo Finance 뉴스 자동 수집 · 출처·한국 시간·키워드 표시 · 15분마다 갱신
       </div>
     </div>
   );
@@ -227,7 +245,14 @@ function NewsList({ title, news, color, emptyMsg }: { title: string; news: any[]
               className="block text-[9px] leading-relaxed hover:bright kr"
               style={{ color: `${color}cc` }}
             >
-              <strong>[{n.symbol}]</strong> {n.title?.slice(0, 80)}
+              <div><strong>[{n.symbol}]</strong> {n.title?.slice(0, 80)}</div>
+              {(n.source || n.relativeTime) && (
+                <div className="text-[8px] dim mt-0.5">
+                  {n.source && <span>📰 {n.source}</span>}
+                  {n.source && n.relativeTime && <span> · </span>}
+                  {n.relativeTime && <span>🕐 {n.relativeTime}</span>}
+                </div>
+              )}
             </a>
           ))}
         </div>

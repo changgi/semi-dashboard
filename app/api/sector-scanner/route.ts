@@ -16,16 +16,12 @@ export const maxDuration = 90;
 //   - 💎 저평가 종목
 // ═══════════════════════════════════════════════════════════
 
+import { getScannerSymbols } from "@/lib/semi-universe";
+
+// 반도체 유니버스에서 30+ 종목 스캔 (한국/미국/대만/네덜란드/일본)
 const SECTOR_SYMBOLS = [
-  // 메가캡 반도체
-  "NVDA", "AMD", "AVGO", "TSM", "INTC", "QCOM", "TXN", "ARM",
-  // 반도체 장비
-  "ASML", "AMAT", "LRCX", "KLAC",
-  // 메모리
-  "MU",
-  // 반도체 ETF
-  "SMH", "SOXX", "SOXL",
-  // 관련 빅테크
+  ...getScannerSymbols(),
+  // 관련 빅테크 (반도체 영향권)
   "MSFT", "GOOGL", "META", "AAPL", "AMZN", "TSLA",
   // 섹터 비교용
   "SPY", "QQQ",

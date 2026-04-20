@@ -13,7 +13,8 @@
     { "path": "/api/cron/compute-correlation",  "schedule": "0 4 * * *" },
     { "path": "/api/cron/daily-alerts",         "schedule": "0 0 * * *" },
     { "path": "/api/cron/journal-snapshot",     "schedule": "30 0 * * *" },
-    { "path": "/api/cron/verify-signals",       "schedule": "0 5 * * *" }
+    { "path": "/api/cron/verify-signals",       "schedule": "0 5 * * *" },
+    { "path": "/api/cron/warehouse-snapshot",   "schedule": "30 15 * * *" }
   ],
   "functions": {
     "app/api/cron/**": { "maxDuration": 300 }

@@ -59,21 +59,10 @@ interface EarningsWatch {
 // ───────────────────────────────────────────────────────────
 // 실적 일정 (하드코딩 + 점진적으로 동적화)
 // ───────────────────────────────────────────────────────────
-const EARNINGS_SCHEDULE = [
-  { symbol: "TSLA",       name: "Tesla",         date: "2026-04-22", quarter: "Q1 2026", importance: 4, affectedETFs: ["QQQ"] },
-  { symbol: "MSFT",       name: "Microsoft",     date: "2026-04-23", quarter: "Q3 2026", importance: 5, affectedETFs: ["QQQ", "SPY"] },
-  { symbol: "INTC",       name: "Intel",         date: "2026-04-24", quarter: "Q1 2026", importance: 3, affectedETFs: ["SMH", "SOXX"] },
-  { symbol: "AAPL",       name: "Apple",         date: "2026-04-30", quarter: "Q2 2026", importance: 5, affectedETFs: ["QQQ", "SPY"] },
-  { symbol: "AMZN",       name: "Amazon",        date: "2026-04-30", quarter: "Q1 2026", importance: 4, affectedETFs: ["QQQ", "SPY"] },
-  { symbol: "GOOGL",      name: "Alphabet",      date: "2026-04-29", quarter: "Q1 2026", importance: 4, affectedETFs: ["QQQ"] },
-  { symbol: "META",       name: "Meta",          date: "2026-04-29", quarter: "Q1 2026", importance: 4, affectedETFs: ["QQQ"] },
-  { symbol: "AMD",        name: "AMD",           date: "2026-05-06", quarter: "Q1 2026", importance: 4, affectedETFs: ["SMH", "SOXX"] },
-  { symbol: "QCOM",       name: "Qualcomm",      date: "2026-05-01", quarter: "Q2 2026", importance: 3, affectedETFs: ["SMH"] },
-  { symbol: "ARM",        name: "ARM Holdings",  date: "2026-05-07", quarter: "Q4 2026", importance: 3, affectedETFs: ["SMH"] },
-  { symbol: "NVDA",       name: "NVIDIA",        date: "2026-05-21", quarter: "Q1 2026", importance: 5, affectedETFs: ["SMH", "SOXX", "QQQ"] },
-  { symbol: "AVGO",       name: "Broadcom",      date: "2026-06-05", quarter: "Q2 2026", importance: 4, affectedETFs: ["SMH", "SOXX"] },
-  { symbol: "MU",         name: "Micron",        date: "2026-06-25", quarter: "Q3 2026", importance: 3, affectedETFs: ["SMH", "SOXX"] },
-];
+import { EXTENDED_EARNINGS_SCHEDULE, getAllSemiSymbols, getSymbolInfo } from "@/lib/semi-universe";
+
+// 실적 일정 - 반도체 유니버스 확장 스케줄 (21개 → 모든 반도체 대장주)
+const EARNINGS_SCHEDULE = EXTENDED_EARNINGS_SCHEDULE;
 
 // ───────────────────────────────────────────────────────────
 // 분석 헬퍼

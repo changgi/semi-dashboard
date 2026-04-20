@@ -15,8 +15,12 @@ interface NewsItem {
   id: string;
   title: string;
   link: string;
-  pubDate: string;
-  source: string;
+  pubDate: string;           // 원본 RFC 822
+  pubDateISO: string;        // ISO 8601 (UTC)
+  pubDateKST: string;        // "2026-04-20 15:30:45 KST"
+  relativeTime: string;      // "3시간 전"
+  description: string;       // 본문 요약
+  source: string;            // 출처 (CNBC, Reuters 등)
   symbol: string;
   // 분석 결과
   sentiment: "positive" | "negative" | "neutral";
@@ -152,8 +156,40 @@ function analyzeSentiment(text: string): {
 }
 
 // ───────────────────────────────────────────────────────────
-// Yahoo Finance RSS 파싱
+// Yahoo Finance RSS 파싱 (출처 + 한국 시간 포함)
 // ───────────────────────────────────────────────────────────
+function formatKSTTime(pubDate: string): { iso: string; kst: string; relative: string } {
+  try {
+    const d = new Date(pubDate);
+    const iso = d.toISOString();
+    
+    // KST 시간 (UTC+9)
+    const kstDate = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    const kst = kstDate.toISOString()
+      .replace("T", " ")
+      .replace(/\.\d{3}Z$/, "")
+      + " KST";
+    
+    // 상대 시간
+    const now = Date.now();
+    const diffMs = now - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHour = Math.floor(diffMs / 3600000);
+    const diffDay = Math.floor(diffMs / 86400000);
+    
+    let relative = "";
+    if (diffMin < 1) relative = "방금 전";
+    else if (diffMin < 60) relative = `${diffMin}분 전`;
+    else if (diffHour < 24) relative = `${diffHour}시간 전`;
+    else if (diffDay < 7) relative = `${diffDay}일 전`;
+    else relative = `${Math.floor(diffDay / 7)}주 전`;
+    
+    return { iso, kst, relative };
+  } catch {
+    return { iso: "", kst: pubDate, relative: "-" };
+  }
+}
+
 async function fetchNewsForSymbol(symbol: string): Promise<NewsItem[]> {
   try {
     const url = `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${symbol}&region=US&lang=en-US`;
@@ -164,12 +200,13 @@ async function fetchNewsForSymbol(symbol: string): Promise<NewsItem[]> {
     if (!res.ok) return [];
     const xml = await res.text();
 
-    // 간단 XML 파싱
     const items: NewsItem[] = [];
     const itemRegex = /<item>([\s\S]*?)<\/item>/g;
     const titleRegex = /<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/;
     const linkRegex = /<link>([\s\S]*?)<\/link>/;
     const dateRegex = /<pubDate>([\s\S]*?)<\/pubDate>/;
+    const descRegex = /<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/;
+    const sourceRegex = /<source[^>]*>([\s\S]*?)<\/source>/;
 
     let match;
     let idx = 0;
@@ -178,15 +215,24 @@ async function fetchNewsForSymbol(symbol: string): Promise<NewsItem[]> {
       const title = titleRegex.exec(itemXml)?.[1]?.trim() ?? "";
       const link = linkRegex.exec(itemXml)?.[1]?.trim() ?? "";
       const pubDate = dateRegex.exec(itemXml)?.[1]?.trim() ?? "";
+      const description = descRegex.exec(itemXml)?.[1]?.trim().replace(/<[^>]+>/g, "").slice(0, 200) ?? "";
+      const source = sourceRegex.exec(itemXml)?.[1]?.trim() ?? "Yahoo Finance";
       if (!title) continue;
 
-      const analysis = analyzeSentiment(title);
+      // 제목 + 설명 합쳐서 감정 분석 (더 정확)
+      const analysis = analyzeSentiment(title + " " + description);
+      const timeInfo = formatKSTTime(pubDate);
+      
       items.push({
         id: `${symbol}_${idx++}`,
         title,
         link,
         pubDate,
-        source: "Yahoo Finance",
+        pubDateISO: timeInfo.iso,
+        pubDateKST: timeInfo.kst,
+        relativeTime: timeInfo.relative,
+        description,
+        source,
         symbol,
         ...analysis,
       });
@@ -203,13 +249,11 @@ async function fetchNewsForSymbol(symbol: string): Promise<NewsItem[]> {
 // ═══════════════════════════════════════════════════════════
 export async function GET() {
   try {
-    // 주요 반도체/빅테크 종목
-    const symbols = [
-      "NVDA", "AMD", "TSM", "INTC", "MU", "AVGO",
-      "SMH", "SOXX",
-      "AAPL", "MSFT", "GOOGL", "META",
-      "SPY", "QQQ",
-    ];
+    // 반도체 유니버스에서 주요 대장주 + 빅테크 조합
+    const { getMajorSymbols } = await import("@/lib/semi-universe");
+    const semiMajors = getMajorSymbols().slice(0, 15);
+    const bigTech = ["AAPL", "MSFT", "GOOGL", "META", "SPY", "QQQ"];
+    const symbols = [...new Set([...semiMajors, ...bigTech])];
 
     // 병렬 조회
     const allNews: NewsItem[] = [];

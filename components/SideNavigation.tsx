@@ -7,11 +7,14 @@ import { useState, useEffect } from "react";
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "morning-brief",    icon: "☀️", label: "아침 요약",        group: "daily" },
+  { id: "portfolio-crud",   icon: "💼", label: "보유종목 관리",    group: "daily" },
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
   { id: "weekly-strategy",  icon: "📅", label: "주간 전략",        group: "daily" },
   { id: "order-slip",       icon: "📝", label: "주문서",           group: "daily" },
   { id: "korea-lens",       icon: "🇰🇷", label: "Korea Lens",       group: "daily" },
+  { id: "rebalance-helper", icon: "⚖️", label: "분산 플랜",        group: "daily" },
+  { id: "research-dashboard", icon: "🔬", label: "연구 데이터",     group: "daily" },
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },

@@ -164,17 +164,25 @@ function deepMergeWithDefaults(defaults: any, data: any): any {
 }
 
 /**
- * 안전한 fetcher (캐시 + 기본값)
- * - 503/500 시 → 최근 캐시 복구 (최대 30분 전 데이터)
+ * 안전한 fetcher (캐시 + 기본값 + 자동 재시도)
+ * - 503/500 시 → 1회 자동 재시도 (3초 후)
+ * - 재시도 실패 시 → 최근 캐시 복구 (최대 30분 전 데이터)
  * - 네트워크 에러 시 → 캐시 복구
  * - 응답 누락 필드 → 기본 빈 값
  * - 절대 throw 안 함
  */
-export async function safeFetcher(url: string): Promise<any> {
+export async function safeFetcher(url: string, retryCount = 0): Promise<any> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
 
     if (!res.ok) {
+      // 🔄 503/504는 한 번 재시도 (Vercel 간헐 장애 대응)
+      if ((res.status === 503 || res.status === 504) && retryCount === 0) {
+        console.info(`[Auto-retry] ${url} → HTTP ${res.status}, 3초 후 재시도`);
+        await new Promise(r => setTimeout(r, 3000));
+        return safeFetcher(url, retryCount + 1);
+      }
+      
       console.warn(`[API soft failure] ${url} → HTTP ${res.status}`);
       
       // 📦 503/500 시 캐시 복구
@@ -238,9 +246,15 @@ export const swrDefaultConfig = {
   fetcher: safeFetcher,
   revalidateOnFocus: false,
   shouldRetryOnError: true,
-  errorRetryCount: 3,
-  errorRetryInterval: 5000,
-  dedupingInterval: 5000,
+  errorRetryCount: 5,        // 3 → 5
+  errorRetryInterval: 3000,  // 5000 → 3000 (더 자주)
+  dedupingInterval: 3000,
+  // 지수 백오프 (3초, 6초, 12초, 24초, 48초)
+  onErrorRetry: (error: any, key: string, config: any, revalidate: any, { retryCount }: { retryCount: number }) => {
+    if (retryCount >= 5) return;
+    const delay = Math.min(3000 * Math.pow(2, retryCount), 60000);
+    setTimeout(() => revalidate({ retryCount }), delay);
+  },
 };
 
 // 디버그 헬퍼 (브라우저 콘솔에서 __semi_cache.stats() 호출 가능)

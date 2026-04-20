@@ -67,6 +67,9 @@ import { KoreaLensPanel } from "@/components/KoreaLensPanel";
 import { MorningBriefPanel } from "@/components/MorningBriefPanel";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { RebalanceHelperPanel } from "@/components/RebalanceHelperPanel";
+import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
+import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -192,6 +195,13 @@ export default function Dashboard() {
           </PanelErrorBoundary>
         </div>
 
+        {/* 💼 PORTFOLIO MANAGER - 종목 추가/수정/삭제 */}
+        <div id="portfolio-crud" className="col-span-12">
+          <PanelErrorBoundary panelName="Portfolio CRUD">
+            <PortfolioCRUDPanel />
+          </PanelErrorBoundary>
+        </div>
+
         {/* 🧠 POSITION GUIDE - AI 종합 판단 + 지금 뭐 해야 하나? */}
         <div id="position-guide" className="col-span-12">
           <PanelErrorBoundary panelName="Position Guide">
@@ -224,6 +234,20 @@ export default function Dashboard() {
         <div id="korea-lens" className="col-span-12">
           <PanelErrorBoundary panelName="Korea Lens">
             <KoreaLensPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* ⚖️ REBALANCE HELPER - 분산 투자 플랜 */}
+        <div id="rebalance-helper" className="col-span-12">
+          <PanelErrorBoundary panelName="Rebalance Helper">
+            <RebalanceHelperPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔬 RESEARCH DASHBOARD - 축적 데이터 분석 */}
+        <div id="research-dashboard" className="col-span-12">
+          <PanelErrorBoundary panelName="Research Dashboard">
+            <ResearchDashboardPanel />
           </PanelErrorBoundary>
         </div>
 
