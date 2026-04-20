@@ -3,7 +3,7 @@
 import useSWR, { mutate } from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
-import { SEMI_UNIVERSE } from "@/lib/semi-universe";
+import { SymbolDisplay, SymbolMeta } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -59,12 +59,15 @@ export function EarningsSchedulePanel() {
     { refreshInterval: 300000 }
   );
 
-  const suggestions = searchSymbol
-    ? SEMI_UNIVERSE.filter(s =>
-        s.symbol.toLowerCase().includes(searchSymbol.toLowerCase()) ||
-        s.name.toLowerCase().includes(searchSymbol.toLowerCase())
-      ).slice(0, 5)
-    : [];
+  // DB 기반 심볼 검색
+  const searchUrlE = searchSymbol.length >= 1
+    ? `/api/symbol-search?q=${encodeURIComponent(searchSymbol)}&limit=8`
+    : null;
+  const { data: searchDataE } = useSWR<{ success: boolean; results: SymbolMeta[] }>(
+    searchUrlE,
+    fetcher
+  );
+  const suggestions = searchDataE?.results ?? [];
 
   const showMsg = (type: "success" | "error", text: string) => {
     setMsg({ type, text });
@@ -263,14 +266,14 @@ export function EarningsSchedulePanel() {
               className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded kr"
             />
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-48 overflow-y-auto z-10">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-64 overflow-y-auto z-10 shadow-lg">
                 {suggestions.map(s => (
                   <button
                     key={s.symbol}
                     onClick={() => selectSuggestion(s)}
-                    className="w-full text-left px-2 py-1.5 text-[10px] kr hover:bg-[rgba(255,176,0,0.1)]"
+                    className="w-full text-left px-2 py-2 hover:bg-[rgba(255,176,0,0.1)] border-b border-[var(--border)]/30"
                   >
-                    <span className="tick font-bold">{s.symbol}</span> {s.name}
+                    <SymbolDisplay meta={s} size="sm" variant="block" showBadges={true} />
                   </button>
                 ))}
               </div>

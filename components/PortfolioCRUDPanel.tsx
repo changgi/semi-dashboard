@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import { safeFetcher } from "@/lib/swr-config";
-import { SEMI_UNIVERSE, SemiSymbol } from "@/lib/semi-universe";
+import { SymbolDisplay, SymbolMeta } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -36,6 +36,7 @@ export function PortfolioCRUDPanel() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [indexFilter, setIndexFilter] = useState<"all" | "sp500" | "nasdaq100" | "kospi100" | "semi">("all");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const { data, isLoading } = useSWR<HoldingsResponse>(
@@ -44,14 +45,15 @@ export function PortfolioCRUDPanel() {
     { refreshInterval: 30000 }
   );
 
-  // 자동완성 추천 (반도체 유니버스 + 한국 ETF)
-  const suggestions: SemiSymbol[] = searchQuery
-    ? SEMI_UNIVERSE.filter(s =>
-        s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.englishName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
-      ).slice(0, 5)
-    : [];
+  // DB 기반 자동완성 (S&P500 + NASDAQ100 + KOSPI100 + 반도체 전종목)
+  const searchUrl = searchQuery.length >= 1
+    ? `/api/symbol-search?q=${encodeURIComponent(searchQuery)}&index=${indexFilter}&limit=10`
+    : null;
+  const { data: searchResults } = useSWR<{ success: boolean; results: SymbolMeta[] }>(
+    searchUrl,
+    fetcher
+  );
+  const suggestions = searchResults?.results ?? [];
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -65,11 +67,11 @@ export function PortfolioCRUDPanel() {
     setEditingId(null);
   };
 
-  const selectSuggestion = (sym: SemiSymbol) => {
+  const selectSuggestion = (sym: SymbolMeta) => {
     setForm(f => ({
       ...f,
       symbol: sym.symbol,
-      name: sym.name,
+      name: sym.displayName || sym.name_ko || sym.symbol,
       currency: sym.country === "KR" ? "KRW" : "USD",
     }));
     setSearchQuery(sym.symbol);
@@ -233,13 +235,18 @@ export function PortfolioCRUDPanel() {
                   className="border border-[var(--border)] rounded p-2 flex items-center justify-between gap-2 flex-wrap"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="tick font-bold text-[12px]">{h.symbol}</span>
-                      <span className="text-[11px] kr">{h.name}</span>
-                      <span className="text-[9px] dim kr">({h.currency})</span>
-                    </div>
+                    <SymbolDisplay
+                      meta={{
+                        symbol: h.symbol,
+                        displayName: h.name,
+                      }}
+                      size="sm"
+                      variant="inline"
+                      showFlag={true}
+                      showBadges={false}
+                    />
                     <div className="text-[10px] dim kr mt-0.5">
-                      {h.shares}주 × 평단 {h.currency === "KRW" ? `₩${h.avg_cost.toLocaleString()}` : `$${h.avg_cost}`}
+                      {h.shares}주 × 평단 {h.currency === "KRW" ? `₩${h.avg_cost.toLocaleString()}` : `$${h.avg_cost}`} ({h.currency})
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -274,6 +281,30 @@ export function PortfolioCRUDPanel() {
           {mode === "add" && (
             <div className="relative">
               <label className="text-[9px] dim kr block mb-1">종목 검색 (심볼 or 회사명)</label>
+              
+              {/* 인덱스 필터 */}
+              <div className="mb-2 flex gap-1 flex-wrap">
+                {[
+                  { val: "all",        label: "🌐 전체" },
+                  { val: "sp500",      label: "🇺🇸 S&P500" },
+                  { val: "nasdaq100",  label: "🚀 NDX100" },
+                  { val: "kospi100",   label: "🇰🇷 KOSPI100" },
+                  { val: "semi",       label: "🎮 반도체" },
+                ].map(f => (
+                  <button
+                    key={f.val}
+                    onClick={() => setIndexFilter(f.val as any)}
+                    className={`text-[9px] px-2 py-1 border rounded kr ${
+                      indexFilter === f.val
+                        ? "border-[var(--amber)] bg-[rgba(255,176,0,0.1)] text-[var(--amber)] font-bold"
+                        : "border-[var(--border)] dim hover:bg-[rgba(255,255,255,0.03)]"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              
               <input
                 type="text"
                 value={searchQuery}
@@ -283,26 +314,25 @@ export function PortfolioCRUDPanel() {
                   setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }));
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="예: NVDA, 엔비디아, TIGER..."
+                placeholder="예: NVDA, 엔비디아, TIGER, 삼성전자..."
                 className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded kr"
               />
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-48 overflow-y-auto z-10">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-64 overflow-y-auto z-10 shadow-lg">
                   {suggestions.map(s => (
                     <button
                       key={s.symbol}
                       onClick={() => selectSuggestion(s)}
-                      className="w-full text-left px-2 py-1.5 text-[10px] kr hover:bg-[rgba(255,176,0,0.1)] flex items-center justify-between"
+                      className="w-full text-left px-2 py-2 hover:bg-[rgba(255,176,0,0.1)] border-b border-[var(--border)]/30"
                     >
-                      <div>
-                        <span className="tick font-bold">{s.symbol}</span>
-                        <span className="ml-2">{s.name}</span>
-                      </div>
-                      <span className="text-[8px] dim">{s.country} · {s.category}</span>
+                      <SymbolDisplay meta={s} size="sm" variant="block" showBadges={true} />
                     </button>
                   ))}
                 </div>
               )}
+              <div className="text-[8px] dim kr mt-1">
+                💡 S&P500 + NASDAQ100 + KOSPI100 + 반도체 전종목 검색 가능
+              </div>
             </div>
           )}
 
@@ -399,7 +429,7 @@ export function PortfolioCRUDPanel() {
       )}
 
       <div className="mt-3 pt-2 border-t border-[var(--border)] text-[8px] dim kr leading-relaxed">
-        💡 반도체 유니버스 {SEMI_UNIVERSE.length}종목 자동완성 · 수정/삭제 시 전 패널 자동 갱신<br />
+        💡 S&P500 + NASDAQ100 + KOSPI100 + 반도체 통합 검색 · 전 패널 자동 갱신<br />
         🔄 삭제는 soft delete (복구 가능)
       </div>
     </div>
