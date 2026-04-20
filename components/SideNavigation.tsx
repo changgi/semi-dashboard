@@ -16,6 +16,7 @@ const SECTIONS = [
   { id: "rebalance-helper", icon: "⚖️", label: "분산 플랜",        group: "daily" },
   { id: "research-dashboard", icon: "🔬", label: "연구 데이터",     group: "daily" },
   { id: "time-machine",     icon: "⏰", label: "타임머신",         group: "daily" },
+  { id: "earnings-schedule", icon: "📅", label: "실적 일정 관리",   group: "daily" },
   { id: "correlation-heatmap", icon: "🔗", label: "상관관계",       group: "daily" },
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },

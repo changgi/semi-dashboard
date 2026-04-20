@@ -71,6 +71,7 @@ import { RebalanceHelperPanel } from "@/components/RebalanceHelperPanel";
 import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
+import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
 import { CorrelationHeatmapPanel } from "@/components/CorrelationHeatmapPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
@@ -257,6 +258,13 @@ export default function Dashboard() {
         <div id="time-machine" className="col-span-12">
           <PanelErrorBoundary panelName="Time Machine">
             <TimeMachinePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📅 EARNINGS SCHEDULE - 실적 일정 관리 */}
+        <div id="earnings-schedule" className="col-span-12">
+          <PanelErrorBoundary panelName="Earnings Schedule">
+            <EarningsSchedulePanel />
           </PanelErrorBoundary>
         </div>
 

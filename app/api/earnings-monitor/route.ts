@@ -199,11 +199,11 @@ function buildPreEarningsAction(
 export async function GET() {
   try {
     const today = new Date();
+    const supabase = createAdmin();
     
     // 포트폴리오 보유 종목 (카일님 포지션) - Supabase 직접 조회
     const portfolioSymbols = new Set<string>();
     try {
-      const supabase = createAdmin();
       const { data: holdings } = await supabase
         .from("portfolio_holdings")
         .select("symbol")
@@ -216,8 +216,37 @@ export async function GET() {
       console.warn("[earnings-monitor] 포트폴리오 조회 실패", e);
     }
 
+    // 실적 일정 로드: DB 우선, 없으면 하드코딩 fallback
+    let EARNINGS_SCHEDULE_DATA: any[] = [];
+    try {
+      const { data: dbEarnings } = await supabase
+        .from("earnings_schedule")
+        .select("*")
+        .eq("is_active", true)
+        .gte("earnings_date", new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0])
+        .order("earnings_date", { ascending: true });
+      
+      if (dbEarnings && dbEarnings.length > 0) {
+        EARNINGS_SCHEDULE_DATA = dbEarnings.map((e: any) => ({
+          symbol: e.symbol,
+          name: e.company_name,
+          date: e.earnings_date,
+          quarter: e.quarter,
+          importance: e.importance,
+          affectedETFs: e.affected_etfs ?? [],
+        }));
+      }
+    } catch (e) {
+      console.warn("[earnings-monitor] DB 로드 실패, fallback 사용");
+    }
+    
+    // DB가 비었거나 에러 → 하드코딩 fallback
+    if (EARNINGS_SCHEDULE_DATA.length === 0) {
+      EARNINGS_SCHEDULE_DATA = EARNINGS_SCHEDULE;
+    }
+
     // 7일 이내 + 이미 지난 3일 이내 실적만 (최근 결과도 포함)
-    const relevant = EARNINGS_SCHEDULE
+    const relevant = EARNINGS_SCHEDULE_DATA
       .map(e => ({ ...e, daysUntil: daysBetween(e.date, today) }))
       .filter(e => e.daysUntil >= -3 && e.daysUntil <= 14)
       .sort((a, b) => a.daysUntil - b.daysUntil);
