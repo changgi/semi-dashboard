@@ -105,13 +105,13 @@ export function PriceAlertsPanel() {
       ) : (
         <>
           {/* 발동된 알림 (우선 표시) */}
-          {data.triggered.length > 0 && (
+          {(data.triggered?.length ?? 0) > 0 && (
             <div className="mb-3">
               <div className="text-[10px] text-[#ff8844] font-bold kr mb-2 flex items-center gap-2">
                 🚨 발동된 알림 ({data.triggered.length}건)
               </div>
               <div className="space-y-1.5">
-                {data.triggered.map((a) => (
+                {(data.triggered ?? []).map((a) => (
                   <TriggeredAlertRow key={a.id} alert={a} onDelete={handleDelete} />
                 ))}
               </div>
@@ -119,13 +119,13 @@ export function PriceAlertsPanel() {
           )}
 
           {/* 대기 중인 알림 */}
-          {data.alerts.length > 0 && (
+          {(data.alerts?.length ?? 0) > 0 && (
             <div>
               <div className="text-[9px] dim kr mb-2">
                 📍 대기 중인 알림 ({data.alerts.length}건)
               </div>
               <div className="space-y-1.5">
-                {data.alerts.map((a) => (
+                {(data.alerts ?? []).map((a) => (
                   <PendingAlertRow key={a.id} alert={a} onDelete={handleDelete} />
                 ))}
               </div>
@@ -133,7 +133,7 @@ export function PriceAlertsPanel() {
           )}
 
           {/* 빈 상태 */}
-          {data.alerts.length === 0 && data.triggered.length === 0 && (
+          {(data.alerts?.length ?? 0) === 0 && (data.triggered?.length ?? 0) === 0 && (
             <div className="text-center py-8 border border-dashed border-[var(--border)] rounded">
               <div className="text-[20px] mb-2">🔔</div>
               <div className="text-[10px] dim kr">설정된 알림이 없습니다</div>

@@ -82,7 +82,7 @@ export function SectorScannerPanel() {
     );
   }
 
-  if (!data?.success) {
+  if (!data?.success || !data.results) {
     return (
       <div className="panel p-3 sm:p-5 text-center py-10">
         <div className="text-[10px] dim kr">
@@ -91,6 +91,18 @@ export function SectorScannerPanel() {
       </div>
     );
   }
+
+  // 방어: results 내 배열이 모두 존재하도록 보장
+  const results = {
+    strongBuys: data.results.strongBuys ?? [],
+    buys: data.results.buys ?? [],
+    neutrals: data.results.neutrals ?? [],
+    sells: data.results.sells ?? [],
+    strongSells: data.results.strongSells ?? [],
+  };
+  const unusualActivity = data.unusualActivity ?? [];
+  const gammaSqueezeCandidates = data.gammaSqueezeCandidates ?? [];
+  const allResults = data.allResults ?? [];
 
   return (
     <div className="panel p-3 sm:p-5">
@@ -137,7 +149,7 @@ export function SectorScannerPanel() {
       {tab === "buys" && (
         <BuySellList
           title="📈 매수 후보 (강도 순)"
-          results={[...data.results.strongBuys, ...data.results.buys]}
+          results={[...results.strongBuys, ...results.buys]}
           type="buy"
           emptyMsg="현재 강력한 매수 시그널 없음"
         />
@@ -145,14 +157,14 @@ export function SectorScannerPanel() {
       {tab === "sells" && (
         <BuySellList
           title="📉 매도 경고 (강도 순)"
-          results={[...data.results.strongSells, ...data.results.sells]}
+          results={[...results.strongSells, ...results.sells]}
           type="sell"
           emptyMsg="현재 명확한 매도 경고 없음"
         />
       )}
-      {tab === "unusual" && <UnusualActivityTab results={data.unusualActivity} />}
-      {tab === "squeeze" && <GammaSqueezeTab results={data.gammaSqueezeCandidates} />}
-      {tab === "all" && <AllResultsTab results={data.allResults} />}
+      {tab === "unusual" && <UnusualActivityTab results={unusualActivity} />}
+      {tab === "squeeze" && <GammaSqueezeTab results={gammaSqueezeCandidates} />}
+      {tab === "all" && <AllResultsTab results={allResults} />}
 
       {/* 교육 섹션 */}
       <div className="mt-3 pt-2 border-t border-[var(--border)] text-[8px] dim kr leading-relaxed">
@@ -164,12 +176,13 @@ export function SectorScannerPanel() {
 }
 
 function getTabCount(data: ScannerData, tabId: TabId): number | null {
+  const r = data.results ?? {};
   switch (tabId) {
-    case "buys": return data.results.strongBuys.length + data.results.buys.length;
-    case "sells": return data.results.strongSells.length + data.results.sells.length;
-    case "unusual": return data.unusualActivity.length;
-    case "squeeze": return data.gammaSqueezeCandidates.length;
-    case "all": return data.allResults.length;
+    case "buys": return (r.strongBuys?.length ?? 0) + (r.buys?.length ?? 0);
+    case "sells": return (r.strongSells?.length ?? 0) + (r.sells?.length ?? 0);
+    case "unusual": return data.unusualActivity?.length ?? 0;
+    case "squeeze": return data.gammaSqueezeCandidates?.length ?? 0;
+    case "all": return data.allResults?.length ?? 0;
     default: return null;
   }
 }
@@ -247,6 +260,9 @@ function SectorSentimentBar({ data }: { data: ScannerData }) {
 // 요약 탭
 // ═══════════════════════════════════════════════════════════
 function OverviewTab({ data }: { data: ScannerData }) {
+  const r = data.results ?? { strongBuys: [], buys: [], neutrals: [], sells: [], strongSells: [] };
+  const ua = data.unusualActivity ?? [];
+  const gs = data.gammaSqueezeCandidates ?? [];
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -254,7 +270,7 @@ function OverviewTab({ data }: { data: ScannerData }) {
           title="🚀 Top Opportunities"
           color="#00ff88"
           subtitle="가장 강한 매수 시그널"
-          results={data.results.strongBuys.slice(0, 3)}
+          results={(r.strongBuys ?? []).slice(0, 3)}
           emptyMsg="강력한 매수 시그널 없음"
           showBadge="strong_buy"
         />
@@ -262,7 +278,7 @@ function OverviewTab({ data }: { data: ScannerData }) {
           title="⚠️ Top Warnings"
           color="#ff3860"
           subtitle="가장 강한 매도 경고"
-          results={data.results.strongSells.slice(0, 3)}
+          results={(r.strongSells ?? []).slice(0, 3)}
           emptyMsg="명확한 매도 경고 없음"
           showBadge="strong_sell"
         />
@@ -273,7 +289,7 @@ function OverviewTab({ data }: { data: ScannerData }) {
           title="🔥 Unusual Activity"
           color="#ffaa44"
           subtitle="비정상 옵션 거래 포착"
-          results={data.unusualActivity.slice(0, 3)}
+          results={ua.slice(0, 3)}
           emptyMsg="현재 비정상 활동 없음"
           showUnusual
         />
@@ -281,7 +297,7 @@ function OverviewTab({ data }: { data: ScannerData }) {
           title="🚀 Gamma Squeeze"
           color="#ee99ff"
           subtitle="급등 잠재력 종목"
-          results={data.gammaSqueezeCandidates.slice(0, 3)}
+          results={gs.slice(0, 3)}
           emptyMsg="Gamma Squeeze 후보 없음"
           showSqueeze
         />

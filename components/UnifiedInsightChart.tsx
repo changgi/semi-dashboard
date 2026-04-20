@@ -155,6 +155,10 @@ export function UnifiedInsightChart() {
         <div className="text-[10px] dim text-center py-16 kr">
           {(data as unknown as { error?: string })?.error || "데이터 로딩 실패"}
         </div>
+      ) : !data.priceSeries || !data.decision ? (
+        <div className="text-[10px] dim text-center py-16 kr">
+          분석 데이터 수집 중... 잠시 후 다시 시도해주세요
+        </div>
       ) : (
         <>
           {/* ═════════ 🎯 최종 결정 카드 (최상단) ═════════ */}
@@ -170,7 +174,7 @@ export function UnifiedInsightChart() {
           </div>
 
           {/* ═════════ 📅 매매 시그널 타임라인 ═════════ */}
-          {data.signals.length > 0 && (
+          {(data.signals?.length ?? 0) > 0 && (
             <div className="mt-3">
               <div className="text-[10px] tick kr font-bold mb-2">
                 📅 Trading Signals Timeline · 매매 시그널 타임라인
@@ -308,13 +312,13 @@ function DecisionCard({ data }: { data: InsightData }) {
 
       {/* 이유 + 리스크 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {d.reasons.length > 0 && (
+        {(d.reasons?.length ?? 0) > 0 && (
           <div>
             <div className="text-[10px] text-[#00ff88] font-bold kr mb-1">
               ✅ 근거 ({d.reasons.length})
             </div>
             <ul className="space-y-1">
-              {d.reasons.slice(0, 5).map((r, i) => (
+              {(d.reasons ?? []).slice(0, 5).map((r, i) => (
                 <li key={i} className="text-[9px] kr leading-relaxed">
                   {r}
                 </li>
@@ -322,13 +326,13 @@ function DecisionCard({ data }: { data: InsightData }) {
             </ul>
           </div>
         )}
-        {d.risks.length > 0 && (
+        {(d.risks?.length ?? 0) > 0 && (
           <div>
             <div className="text-[10px] text-[#ff3860] font-bold kr mb-1">
               ⚠️ 리스크 ({d.risks.length})
             </div>
             <ul className="space-y-1">
-              {d.risks.slice(0, 5).map((r, i) => (
+              {(d.risks ?? []).slice(0, 5).map((r, i) => (
                 <li key={i} className="text-[9px] kr leading-relaxed">
                   {r}
                 </li>
@@ -345,8 +349,14 @@ function DecisionCard({ data }: { data: InsightData }) {
 // 📊 통합 차트 (핵심!)
 // ═══════════════════════════════════════════════════════════
 function IntegratedChart({ data }: { data: InsightData }) {
+  // 방어: 배열이 없으면 빈 배열로
+  const priceSeries = data.priceSeries ?? [];
+  const levels = data.levels ?? [];
+  const events = data.events ?? [];
+  const signals = data.signals ?? [];
+
   // 차트 데이터 준비
-  const chartData = data.priceSeries.map((p) => ({
+  const chartData = priceSeries.map((p) => ({
     date: p.date,
     dateShort: p.date.slice(5), // MM-DD
     actual: p.actual,
@@ -358,8 +368,8 @@ function IntegratedChart({ data }: { data: InsightData }) {
   }));
 
   // 오늘 날짜 찾기
-  const todayIndex = data.priceSeries.findIndex((p) => p.isToday);
-  const todayDate = data.priceSeries[todayIndex]?.date;
+  const todayIndex = priceSeries.findIndex((p) => p.isToday);
+  const todayDate = priceSeries[todayIndex]?.date;
 
   // Y축 범위 계산
   const allPrices = [
@@ -367,11 +377,11 @@ function IntegratedChart({ data }: { data: InsightData }) {
     ...chartData.filter(d => d.forecast !== null).map(d => d.forecast as number),
     ...chartData.filter(d => d.upperBand !== null).map(d => d.upperBand as number),
     ...chartData.filter(d => d.lowerBand !== null).map(d => d.lowerBand as number),
-    ...data.levels.map(l => l.price),
+    ...levels.map(l => l.price),
   ].filter((v): v is number => v !== null && !isNaN(v));
 
-  const minY = Math.min(...allPrices) * 0.98;
-  const maxY = Math.max(...allPrices) * 1.02;
+  const minY = allPrices.length > 0 ? Math.min(...allPrices) * 0.98 : 0;
+  const maxY = allPrices.length > 0 ? Math.max(...allPrices) * 1.02 : 100;
 
   return (
     <div style={{ width: "100%", height: 440 }}>
@@ -484,7 +494,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
           )}
 
           {/* ═════════ 옵션 레벨 가로선 ═════════ */}
-          {data.levels.map((lvl, i) => (
+          {levels.map((lvl, i) => (
             <ReferenceLine
               key={`level-${i}`}
               y={lvl.price}
@@ -505,7 +515,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
           ))}
 
           {/* ═════════ 이벤트 세로선 (OpEx 등) ═════════ */}
-          {data.events.filter(e => e.importance >= 4).map((ev, i) => (
+          {events.filter(e => e.importance >= 4).map((ev, i) => (
             <ReferenceLine
               key={`event-${i}`}
               x={ev.date.slice(5)}
@@ -523,7 +533,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
           ))}
 
           {/* ═════════ 매매 시그널 점 (핵심!) ═════════ */}
-          {data.signals.map((sig, i) => {
+          {signals.map((sig, i) => {
             const seriesPoint = chartData.find(c => c.date === sig.date);
             if (!seriesPoint) return null;
             return (

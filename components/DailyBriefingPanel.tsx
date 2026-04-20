@@ -90,7 +90,23 @@ export function DailyBriefingPanel() {
     );
   }
 
+  // 방어: 모든 필드가 존재하도록 보장
+  if (!data.executiveSummary || !data.macro) {
+    return (
+      <div className="panel p-3 sm:p-5 text-center py-10">
+        <div className="text-[10px] dim kr">브리핑 데이터 수집 중... 잠시 후 다시 시도</div>
+      </div>
+    );
+  }
+
   const { executiveSummary: exec, macro } = data;
+  const actionItems = data.actionItems ?? [];
+  const symbolSignals = data.symbolSignals ?? [];
+  const todayEvents = data.todayEvents ?? [];
+  const portfolioSummary = data.portfolioSummary ?? {
+    totalValueUsd: 0, totalGainPct: 0, positionCount: 0, riskScore: 0,
+  };
+  const keyPoints = exec.keyPoints ?? [];
 
   return (
     <div className="panel p-3 sm:p-5">
@@ -176,11 +192,11 @@ export function DailyBriefingPanel() {
         </div>
 
         {/* Key Points */}
-        {exec.keyPoints.length > 0 && (
+        {keyPoints.length > 0 && (
           <div className="mt-3 pt-3 border-t border-[var(--border)]">
             <div className="text-[10px] tick kr font-bold mb-2">🔑 핵심 포인트</div>
             <div className="space-y-1">
-              {exec.keyPoints.map((p, i) => (
+              {keyPoints.map((p, i) => (
                 <div key={i} className="text-[10px] sm:text-[11px] kr leading-relaxed">
                   {p}
                 </div>
@@ -196,19 +212,19 @@ export function DailyBriefingPanel() {
         <div className="border border-[var(--amber-dim)] bg-[rgba(255,176,0,0.03)] rounded p-2">
           <div className="text-[8px] dim kr">💼 포트폴리오</div>
           <div className="text-[14px] tick font-bold">
-            ${data.portfolioSummary.totalValueUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            ${portfolioSummary.totalValueUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
           <div
             className={`text-[10px] font-bold ${
-              data.portfolioSummary.totalGainPct >= 0 ? "up" : "down"
+              portfolioSummary.totalGainPct >= 0 ? "up" : "down"
             }`}
           >
-            {data.portfolioSummary.totalGainPct >= 0 ? "+" : ""}
-            {data.portfolioSummary.totalGainPct.toFixed(2)}%
+            {portfolioSummary.totalGainPct >= 0 ? "+" : ""}
+            {portfolioSummary.totalGainPct.toFixed(2)}%
           </div>
           <div className="text-[8px] dim kr mt-1">
-            리스크: <span className={data.portfolioSummary.riskScore > 50 ? "down" : "up"}>
-              {data.portfolioSummary.riskScore}/100
+            리스크: <span className={portfolioSummary.riskScore > 50 ? "down" : "up"}>
+              {portfolioSummary.riskScore}/100
             </span>
           </div>
         </div>
@@ -273,13 +289,13 @@ export function DailyBriefingPanel() {
       </div>
 
       {/* ═════════ 🎯 오늘 할 일 (액션 아이템) ═════════ */}
-      {data.actionItems.length > 0 && (
+      {actionItems.length > 0 && (
         <div className="mb-4">
           <div className="text-[11px] tick kr font-bold mb-2">
-            🎯 오늘 할 일 체크리스트 ({data.actionItems.length})
+            🎯 오늘 할 일 체크리스트 ({actionItems.length})
           </div>
           <div className="space-y-2">
-            {data.actionItems.map((a, i) => (
+            {actionItems.map((a, i) => (
               <ActionItemRow key={i} action={a} index={i + 1} />
             ))}
           </div>
@@ -306,7 +322,7 @@ export function DailyBriefingPanel() {
               </tr>
             </thead>
             <tbody>
-              {data.symbolSignals.map((s) => (
+              {symbolSignals.map((s) => (
                 <SymbolRow key={s.symbol} signal={s} />
               ))}
             </tbody>
@@ -321,11 +337,11 @@ export function DailyBriefingPanel() {
           <div className="text-[10px] tick kr font-bold mb-2">
             📅 오늘 주목할 이벤트
           </div>
-          {data.todayEvents.length === 0 ? (
+          {todayEvents.length === 0 ? (
             <div className="text-[9px] dim kr">특별한 이벤트 없음</div>
           ) : (
             <div className="space-y-2">
-              {data.todayEvents.map((e, i) => (
+              {todayEvents.map((e, i) => (
                 <div key={i} className="border-l-2 border-[var(--amber)] bg-[rgba(255,176,0,0.03)] pl-2 py-1">
                   <div className="text-[10px] tick font-bold">{e.event}</div>
                   <div className="text-[8px] dim kr">⏰ {e.time}</div>

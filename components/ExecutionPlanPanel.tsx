@@ -110,6 +110,19 @@ export function ExecutionPlanPanel() {
     );
   }
 
+  // 방어: 배열과 객체가 모두 존재하도록 보장
+  const orders = data.orders ?? [];
+  const summary = data.summary ?? {
+    totalBuyAmount: 0, totalSellAmount: 0, netFlow: 0,
+    executionOrder: [], keyRecommendations: [],
+  };
+  const expectedPortfolio = data.expectedPortfolio ?? {
+    beforeTotal: 0, afterTotal: 0, beforePositions: 0, afterPositions: 0,
+    diversificationScore: 0,
+  };
+  const risks = data.risks ?? [];
+  const opportunities = data.opportunities ?? [];
+
   return (
     <div className="panel p-3 sm:p-5">
       {/* 헤더 */}
@@ -140,9 +153,9 @@ export function ExecutionPlanPanel() {
         />
         <SummaryBox
           label="📋 주문 수"
-          value={`${data.orders.length}건`}
+          value={`${orders.length}건`}
           subtitle={
-            data.orders.filter(o => o.urgency === "immediate" || o.urgency === "today").length +
+            orders.filter(o => o.urgency === "immediate" || o.urgency === "today").length +
             "건 오늘 실행"
           }
           color="green"
@@ -150,39 +163,39 @@ export function ExecutionPlanPanel() {
         <SummaryBox
           label="📈 순 흐름"
           value={
-            data.summary.netFlow > 0
-              ? `+₩${(data.summary.netFlow / 1000).toFixed(0)}K`
-              : data.summary.netFlow < 0
-              ? `-₩${(Math.abs(data.summary.netFlow) / 1000).toFixed(0)}K`
+            summary.netFlow > 0
+              ? `+₩${(summary.netFlow / 1000).toFixed(0)}K`
+              : summary.netFlow < 0
+              ? `-₩${(Math.abs(summary.netFlow) / 1000).toFixed(0)}K`
               : "±0"
           }
-          subtitle={data.summary.netFlow > 0 ? "순매수" : data.summary.netFlow < 0 ? "순매도" : "중립"}
-          color={data.summary.netFlow > 0 ? "green" : data.summary.netFlow < 0 ? "red" : "gray"}
+          subtitle={summary.netFlow > 0 ? "순매수" : summary.netFlow < 0 ? "순매도" : "중립"}
+          color={summary.netFlow > 0 ? "green" : summary.netFlow < 0 ? "red" : "gray"}
         />
         <SummaryBox
           label="🎯 분산도"
-          value={`${data.expectedPortfolio.diversificationScore}/100`}
+          value={`${expectedPortfolio.diversificationScore}/100`}
           subtitle={
-            data.expectedPortfolio.diversificationScore >= 80 ? "우수" :
-            data.expectedPortfolio.diversificationScore >= 50 ? "보통" :
+            expectedPortfolio.diversificationScore >= 80 ? "우수" :
+            expectedPortfolio.diversificationScore >= 50 ? "보통" :
             "개선 필요"
           }
           color={
-            data.expectedPortfolio.diversificationScore >= 80 ? "green" :
-            data.expectedPortfolio.diversificationScore >= 50 ? "amber" :
+            expectedPortfolio.diversificationScore >= 80 ? "green" :
+            expectedPortfolio.diversificationScore >= 50 ? "amber" :
             "red"
           }
         />
       </div>
 
       {/* ═════════ 핵심 추천 ═════════ */}
-      {data.summary.keyRecommendations.length > 0 && (
+      {summary.keyRecommendations.length > 0 && (
         <div className="mb-3 p-3 border border-[var(--amber-dim)] bg-[rgba(255,176,0,0.03)] rounded">
           <div className="text-[10px] tick kr font-bold mb-2">
             🎯 핵심 추천 사항
           </div>
           <div className="space-y-1">
-            {data.summary.keyRecommendations.map((k, i) => (
+            {summary.keyRecommendations.map((k, i) => (
               <div key={i} className="text-[10px] kr">{k}</div>
             ))}
           </div>
@@ -190,17 +203,17 @@ export function ExecutionPlanPanel() {
       )}
 
       {/* ═════════ 주문 리스트 ═════════ */}
-      {data.orders.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="text-[10px] dim text-center py-10 kr border border-[var(--border)] rounded">
           ✅ 현재 추천 주문 없음 - 포지션 유지 권장
         </div>
       ) : (
         <div>
           <div className="text-[10px] tick kr font-bold mb-2">
-            📋 주문 체크리스트 ({data.orders.length}건)
+            📋 주문 체크리스트 ({orders.length}건)
           </div>
           <div className="space-y-2">
-            {data.orders.map((order, idx) => (
+            {orders.map((order, idx) => (
               <OrderCard
                 key={order.id}
                 order={order}
@@ -219,33 +232,33 @@ export function ExecutionPlanPanel() {
                 <div
                   className="h-full bg-[var(--amber)] transition-all"
                   style={{
-                    width: `${(checkedOrders.size / data.orders.length) * 100}%`,
+                    width: `${(checkedOrders.size / orders.length) * 100}%`,
                   }}
                 />
               </div>
             </div>
             <div className="text-[11px] tick font-bold">
-              {checkedOrders.size} / {data.orders.length}
+              {checkedOrders.size} / {orders.length}
             </div>
           </div>
         </div>
       )}
 
       {/* ═════════ 리스크/기회 ═════════ */}
-      {(data.risks.length > 0 || data.opportunities.length > 0) && (
+      {(risks.length > 0 || opportunities.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-          {data.risks.length > 0 && (
+          {risks.length > 0 && (
             <div className="border border-[#ff3860]/30 bg-[rgba(255,56,96,0.03)] rounded p-2">
               <div className="text-[10px] text-[#ff3860] font-bold kr mb-1">⚠️ 리스크</div>
-              {data.risks.map((r, i) => (
+              {risks.map((r, i) => (
                 <div key={i} className="text-[9px] kr leading-relaxed">• {r}</div>
               ))}
             </div>
           )}
-          {data.opportunities.length > 0 && (
+          {opportunities.length > 0 && (
             <div className="border border-[#00ff88]/30 bg-[rgba(0,255,136,0.03)] rounded p-2">
               <div className="text-[10px] text-[#00ff88] font-bold kr mb-1">💎 기회</div>
-              {data.opportunities.map((o, i) => (
+              {opportunities.map((o, i) => (
                 <div key={i} className="text-[9px] kr leading-relaxed">• {o}</div>
               ))}
             </div>

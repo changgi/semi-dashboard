@@ -83,7 +83,13 @@ export function PortfolioRiskPanel() {
     );
   }
 
-  if (data.positions.length === 0) {
+  // 방어: 배열이 undefined여도 빈 배열로 처리
+  const positions = data.positions ?? [];
+  const topRisks = data.topRisks ?? [];
+  const topOpportunities = data.topOpportunities ?? [];
+  const recommendedActions = data.recommendedActions ?? [];
+
+  if (positions.length === 0) {
     return (
       <div className="panel p-3 sm:p-5 text-center py-10">
         <div className="text-[10px] dim kr">포트폴리오에 보유 종목이 없습니다</div>
@@ -146,7 +152,7 @@ export function PortfolioRiskPanel() {
             <div className="text-[20px] tick font-bold">
               ${data.totalValueUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>
-            <div className="text-[8px] dim kr">{data.positions.length}개 포지션</div>
+            <div className="text-[8px] dim kr">{positions.length}개 포지션</div>
           </div>
         </div>
 
@@ -175,13 +181,13 @@ export function PortfolioRiskPanel() {
       </div>
 
       {/* ═════════ 추천 액션 ═════════ */}
-      {data.recommendedActions.length > 0 && (
+      {recommendedActions.length > 0 && (
         <div className="mb-3">
           <div className="text-[10px] tick kr font-bold mb-2">
-            🎯 Recommended Actions · 추천 액션 ({data.recommendedActions.length})
+            🎯 Recommended Actions · 추천 액션 ({recommendedActions.length})
           </div>
           <div className="space-y-1.5">
-            {data.recommendedActions.map((a, i) => (
+            {recommendedActions.map((a, i) => (
               <div
                 key={i}
                 className={`border-l-4 rounded-r p-2 ${
@@ -222,15 +228,15 @@ export function PortfolioRiskPanel() {
         {/* Top Risks */}
         <div>
           <div className="text-[10px] text-[#ff3860] font-bold kr mb-2">
-            ⚠️ Top Risks ({data.topRisks.length})
+            ⚠️ Top Risks ({topRisks.length})
           </div>
-          {data.topRisks.length === 0 ? (
+          {topRisks.length === 0 ? (
             <div className="text-[9px] dim kr p-2 border border-[var(--border)] rounded">
               ✅ 현재 주요 리스크 없음
             </div>
           ) : (
             <div className="space-y-1">
-              {data.topRisks.map((r, i) => (
+              {topRisks.map((r, i) => (
                 <div
                   key={i}
                   className="border-l-2 border-[#ff3860] bg-[rgba(255,56,96,0.03)] rounded-r p-2"
@@ -249,15 +255,15 @@ export function PortfolioRiskPanel() {
         {/* Top Opportunities */}
         <div>
           <div className="text-[10px] text-[#00ff88] font-bold kr mb-2">
-            💎 Top Opportunities ({data.topOpportunities.length})
+            💎 Top Opportunities ({topOpportunities.length})
           </div>
-          {data.topOpportunities.length === 0 ? (
+          {topOpportunities.length === 0 ? (
             <div className="text-[9px] dim kr p-2 border border-[var(--border)] rounded">
               명확한 강세 시그널 없음
             </div>
           ) : (
             <div className="space-y-1">
-              {data.topOpportunities.map((o, i) => (
+              {topOpportunities.map((o, i) => (
                 <div
                   key={i}
                   className="border-l-2 border-[#00ff88] bg-[rgba(0,255,136,0.03)] rounded-r p-2"
@@ -280,7 +286,7 @@ export function PortfolioRiskPanel() {
           📊 Position Analysis · 포지션별 분석
         </div>
         <div className="space-y-2">
-          {data.positions.map((p) => (
+          {positions.map((p) => (
             <PositionRow key={p.holding.id} position={p} />
           ))}
         </div>
