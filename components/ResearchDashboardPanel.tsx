@@ -38,12 +38,38 @@ interface ResearchData {
 // ═══════════════════════════════════════════════════════════
 export function ResearchDashboardPanel() {
   const [tab, setTab] = useState<"regime" | "patterns" | "correlations" | "findings">("regime");
+  const [collecting, setCollecting] = useState(false);
+  const [collectMsg, setCollectMsg] = useState<string | null>(null);
 
-  const { data, isLoading } = useSWR<ResearchData>(
+  const { data, isLoading, mutate } = useSWR<ResearchData>(
     "/api/research-dashboard",
     fetcher,
     { refreshInterval: 600000 }
   );
+
+  const triggerCollection = async () => {
+    if (!confirm("지금 시세/국면/상관관계를 수집하시겠습니까?\n(약 30초 소요)")) return;
+    setCollecting(true);
+    setCollectMsg(null);
+    try {
+      const res = await fetch("/api/cron/warehouse-snapshot?force=true");
+      const json = await res.json();
+      if (json.success) {
+        setCollectMsg(
+          `✅ 수집 완료! 스냅샷 ${json.summary?.snapshots_captured}건, ` +
+          `상관관계 ${json.summary?.correlations_updated}쌍`
+        );
+        mutate(); // 화면 갱신
+      } else {
+        setCollectMsg(`❌ 실패: ${json.error ?? "Unknown"}`);
+      }
+    } catch (e) {
+      setCollectMsg(`❌ 네트워크 에러: ${(e as Error).message}`);
+    } finally {
+      setCollecting(false);
+      setTimeout(() => setCollectMsg(null), 5000);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -73,7 +99,21 @@ export function ResearchDashboardPanel() {
             시장 국면 · 패턴 승률 · 상관관계 · 인사이트 아카이브
           </div>
         </div>
+        <button
+          onClick={triggerCollection}
+          disabled={collecting}
+          className="text-[10px] px-3 py-1.5 border border-[var(--amber)] bg-[var(--amber)] text-[#111] rounded kr font-bold disabled:opacity-50"
+        >
+          {collecting ? "⏳ 수집 중..." : "🔄 지금 수집"}
+        </button>
       </div>
+
+      {/* 수집 결과 메시지 */}
+      {collectMsg && (
+        <div className={`mb-3 p-2 rounded text-[10px] kr ${collectMsg.startsWith("✅") ? "up bg-[rgba(0,255,136,0.1)]" : "down bg-[rgba(255,56,96,0.1)]"}`}>
+          {collectMsg}
+        </div>
+      )}
 
       {/* 통계 카드 */}
       <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-2">

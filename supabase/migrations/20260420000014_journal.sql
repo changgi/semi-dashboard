@@ -161,6 +161,12 @@ ALTER TABLE journal_signal_tracking ENABLE ROW LEVEL SECURITY;
 ALTER TABLE journal_trades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE journal_weekly_reviews ENABLE ROW LEVEL SECURITY;
 
+-- 기존 정책 제거 후 재생성 (재실행 안전)
+DROP POLICY IF EXISTS "Allow all for service role" ON journal_daily_snapshots;
+DROP POLICY IF EXISTS "Allow all for service role" ON journal_signal_tracking;
+DROP POLICY IF EXISTS "Allow all for service role" ON journal_trades;
+DROP POLICY IF EXISTS "Allow all for service role" ON journal_weekly_reviews;
+
 CREATE POLICY "Allow all for service role" ON journal_daily_snapshots FOR ALL USING (true);
 CREATE POLICY "Allow all for service role" ON journal_signal_tracking FOR ALL USING (true);
 CREATE POLICY "Allow all for service role" ON journal_trades FOR ALL USING (true);

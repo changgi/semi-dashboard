@@ -184,6 +184,7 @@ export async function GET(req: NextRequest) {
           
           correlations.push({
             computed_at: new Date().toISOString(),
+            computed_date: new Date().toISOString().split("T")[0],
             lookback_days: 90,
             symbol_a: a,
             symbol_b: b,

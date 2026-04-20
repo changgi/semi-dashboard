@@ -70,6 +70,8 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { RebalanceHelperPanel } from "@/components/RebalanceHelperPanel";
 import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
+import { TimeMachinePanel } from "@/components/TimeMachinePanel";
+import { CorrelationHeatmapPanel } from "@/components/CorrelationHeatmapPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -248,6 +250,20 @@ export default function Dashboard() {
         <div id="research-dashboard" className="col-span-12">
           <PanelErrorBoundary panelName="Research Dashboard">
             <ResearchDashboardPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* ⏰ TIME MACHINE - 유사 국면 검색 */}
+        <div id="time-machine" className="col-span-12">
+          <PanelErrorBoundary panelName="Time Machine">
+            <TimeMachinePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔗 CORRELATION HEATMAP - 상관관계 시각화 */}
+        <div id="correlation-heatmap" className="col-span-12">
+          <PanelErrorBoundary panelName="Correlation Heatmap">
+            <CorrelationHeatmapPanel />
           </PanelErrorBoundary>
         </div>
 

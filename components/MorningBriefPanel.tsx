@@ -18,6 +18,7 @@ interface Data {
   urgentEvents: Array<{ title: string; daysUntil: number; importance: number; impact: string }>;
   thisWeekEarnings: Array<{ symbol: string; daysUntil: number; impact: string }>;
   personalizedTips: string[];
+  recentInsights: Array<{ title: string; insight: string; category: string; confidence: number }>;
   rawData: any;
 }
 
@@ -189,6 +190,26 @@ export function MorningBriefPanel() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* 🔬 오늘의 자동 인사이트 (축적 데이터 기반) */}
+      {(data.recentInsights ?? []).length > 0 && (
+        <div className="mb-4 border border-[#aaccff]/30 bg-[rgba(170,204,255,0.03)] rounded p-3">
+          <div className="text-[10px] font-bold kr mb-2" style={{ color: "#aaccff" }}>
+            🔬 오늘 자동 감지된 인사이트 ({data.recentInsights.length})
+          </div>
+          {(data.recentInsights ?? []).map((ins, i) => (
+            <div key={i} className="text-[10px] kr leading-relaxed mb-2 p-2 bg-black/20 rounded">
+              <div className="font-bold" style={{ color: "#aaccff" }}>
+                {ins.title}
+              </div>
+              <div className="mt-0.5 dim">{ins.insight}</div>
+              <div className="text-[8px] dim mt-1">
+                신뢰도 {Math.round(ins.confidence * 100)}% · 카테고리: {ins.category}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

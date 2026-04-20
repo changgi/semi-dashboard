@@ -121,6 +121,7 @@ COMMENT ON TABLE pattern_library IS '반복되는 투자 패턴과 승률 축적
 CREATE TABLE IF NOT EXISTS correlation_matrix (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   computed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  computed_date DATE NOT NULL DEFAULT CURRENT_DATE,  -- UNIQUE 제약용 분리 컬럼
   lookback_days INTEGER NOT NULL,     -- 30, 90, 180, 365
   
   symbol_a TEXT NOT NULL,
@@ -133,7 +134,7 @@ CREATE TABLE IF NOT EXISTS correlation_matrix (
   beta DECIMAL(6, 4),                 -- symbol_a's beta vs symbol_b
   r_squared DECIMAL(5, 4),
   
-  CONSTRAINT unique_correlation UNIQUE (symbol_a, symbol_b, lookback_days, computed_at::DATE)
+  CONSTRAINT unique_correlation UNIQUE (symbol_a, symbol_b, lookback_days, computed_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_corr_symbol_a ON correlation_matrix (symbol_a, lookback_days);

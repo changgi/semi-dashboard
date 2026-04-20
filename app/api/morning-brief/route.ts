@@ -177,6 +177,27 @@ export async function GET(req: Request) {
     if (fxImpact > 100000) {
       personalizedTips.push(`💱 환차익 ${fxSign}₩${fxImpact.toLocaleString()} - Korea Lens에서 환전 실익 확인`);
     }
+
+    // ─────────────────────────────────────────────
+    // 7.5. 오늘의 자동 인사이트 (축적 데이터 기반)
+    // ─────────────────────────────────────────────
+    const recentInsights: Array<{ title: string; insight: string; category: string; confidence: number }> = [];
+    try {
+      const insightData = await fetchInternal("/api/research-dashboard", req);
+      if (insightData?.recentFindings) {
+        for (const f of insightData.recentFindings.slice(0, 3)) {
+          // 오늘 생성된 것만
+          if (f.date === dateStr) {
+            recentInsights.push({
+              title: f.title,
+              insight: f.insight,
+              category: f.category,
+              confidence: f.confidence ?? 0.5,
+            });
+          }
+        }
+      }
+    } catch {}
     
     return NextResponse.json({
       success: true,
@@ -200,6 +221,9 @@ export async function GET(req: Request) {
       
       // 맞춤 조언
       personalizedTips,
+
+      // 🔬 오늘의 자동 인사이트 (축적 데이터)
+      recentInsights,
       
       // 원시 데이터 (UI에서 활용)
       rawData: {
@@ -230,6 +254,7 @@ export async function GET(req: Request) {
       urgentEvents: [],
       thisWeekEarnings: [],
       personalizedTips: [],
+      recentInsights: [],
       rawData: {},
     });
   }

@@ -26,6 +26,7 @@ interface PushConfig {
     vixExtreme: boolean;
     earningsAlert: boolean;
     portfolioAlert: boolean;
+    autoInsights: boolean;  // 🆕 자동 감지 패턴/인사이트
   };
 }
 
@@ -37,6 +38,7 @@ const DEFAULT_CONFIG: PushConfig = {
     vixExtreme: true,
     earningsAlert: true,
     portfolioAlert: true,
+    autoInsights: true,
   },
 };
 
@@ -151,6 +153,13 @@ export function PushNotifications() {
     { refreshInterval: 300000 }
   );
 
+  // 🔬 축적된 자동 인사이트
+  const { data: research } = useSWR(
+    config.enabled && permission === "granted" ? "/api/research-dashboard" : null,
+    fetcher,
+    { refreshInterval: 600000 }
+  );
+
   // 시그널 체크 로직
   useEffect(() => {
     if (!config.enabled || permission !== "granted") return;
@@ -229,12 +238,30 @@ export function PushNotifications() {
       }
     }
 
+    // 4. 🔬 자동 인사이트 (축적 데이터 기반 패턴/이상 감지)
+    if (config.categories.autoInsights && research?.success) {
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayFindings = (research.recentFindings ?? []).filter((f: any) => f.date === todayStr);
+      for (const f of todayFindings.slice(0, 2)) {
+        const key = `insight_${f.category}_${f.title.slice(0, 30)}`;
+        if (!lastNotified[key] || now - lastNotified[key] > NOTIFY_COOLDOWN * 6) {
+          notify(
+            `🔬 ${f.title}`,
+            `${f.insight.slice(0, 100)} (신뢰도 ${Math.round((f.confidence ?? 0.5) * 100)}%)`,
+            key
+          );
+          lastNotified[key] = now;
+          updated = true;
+        }
+      }
+    }
+
     if (updated) {
       const newConfig = { ...config, lastNotified };
       setConfig(newConfig);
       saveConfig(newConfig);
     }
-  }, [sector, briefing, calendar, config, permission]);
+  }, [sector, briefing, calendar, research, config, permission]);
 
   // 설정 패널이 가려져있으면 floating button만
   if (!visible) {
@@ -342,6 +369,12 @@ export function PushNotifications() {
                 label="포트폴리오 급변동"
                 value={config.categories.portfolioAlert}
                 onChange={() => toggleCategory("portfolioAlert")}
+              />
+              <CategoryToggle
+                icon="🔬"
+                label="자동 패턴/인사이트 감지"
+                value={config.categories.autoInsights}
+                onChange={() => toggleCategory("autoInsights")}
               />
             </div>
           )}
