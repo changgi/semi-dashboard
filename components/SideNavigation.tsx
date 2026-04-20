@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
+  { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },

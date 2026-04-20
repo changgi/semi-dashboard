@@ -60,6 +60,7 @@ import { UrgentEventBanner } from "@/components/UrgentEventBanner";
 import { EarningsMonitorPanel } from "@/components/EarningsMonitorPanel";
 import { PositionGuidePanel } from "@/components/PositionGuidePanel";
 import { PushNotifications } from "@/components/PushNotifications";
+import { StrategyAssistantPanel } from "@/components/StrategyAssistantPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -182,6 +183,13 @@ export default function Dashboard() {
         <div id="position-guide" className="col-span-12">
           <PanelErrorBoundary panelName="Position Guide">
             <PositionGuidePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 💬 STRATEGY ASSISTANT - 5가지 질문 즉답 */}
+        <div id="strategy-assistant" className="col-span-12">
+          <PanelErrorBoundary panelName="Strategy Assistant">
+            <StrategyAssistantPanel />
           </PanelErrorBoundary>
         </div>
 
