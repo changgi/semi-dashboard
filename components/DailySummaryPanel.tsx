@@ -148,7 +148,7 @@ export function DailySummaryPanel() {
       {/* 1️⃣ 최상단 긴급 알림 (Alerts) */}
       {data.alerts.length > 0 && (
         <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {data.alerts.map((alert, i) => (
+          {(data.alerts ?? []).map((alert, i) => (
             <div
               key={i}
               className={`border-l-2 rounded-r p-2 ${

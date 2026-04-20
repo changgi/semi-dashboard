@@ -328,7 +328,7 @@ export function BacktestPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.bucketResults.map((b) => {
+                  {(data.bucketResults ?? []).map((b) => {
                     const emoji = b.name === "매우 우호" ? "🚀" :
                                   b.name === "우호" ? "📈" :
                                   b.name === "중립" ? "⚖️" : "📉";

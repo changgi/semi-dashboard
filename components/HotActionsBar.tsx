@@ -138,7 +138,7 @@ export function HotActionsBar() {
             {/* 알림 메시지 (스크롤로) */}
             {data.alerts.length > 0 && (
               <div className="hidden lg:flex items-center gap-3 shrink-0 ml-2 text-[10px]">
-                {data.alerts.map((alert, i) => (
+                {(data.alerts ?? []).map((alert, i) => (
                   <span key={i} className="dim hover:bright kr">
                     {alert}
                   </span>

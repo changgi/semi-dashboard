@@ -81,7 +81,7 @@ const EMPTY_DEFAULTS: Record<string, any> = {
   actionItems: [], symbolSignals: [], todayEvents: [],
   pendingSignals: [], snapshots: [], symbolStats: [], portfolioTrend: [],
   insights: [],
-  news: [], agents: [], comparisons: [],
+  news: [], comparisons: [],
   items: [], list: [], rows: [],
   results: { strongBuys: [], buys: [], neutrals: [], sells: [], strongSells: [] },
   summary: { keyRecommendations: [], executionOrder: [], totalBuyAmount: 0, totalSellAmount: 0, netFlow: 0 },
@@ -96,11 +96,52 @@ const EMPTY_DEFAULTS: Record<string, any> = {
   prediction: { direction: "neutral", confidence: 0, targetPrice: 0, targetPct: 0, signals: [], rationale: [], timeHorizon: "" },
   gex: { total: 0, regime: "neutral" },
   ivStructure: { atmCallIV: 0, atmPutIV: 0 },
-  profile: { currentRegime: "unknown", currentGamma: 0, flipLevel: null, largestConcentrations: [] },
+  profile: { currentRegime: "unknown", currentGamma: 0, flipLevel: null, largestConcentrations: [], pricePoints: [] },
   interpretation: { signals: [], scenarios: [], summary: "" },
   decision: { actionLabel: "", icon: "", confidence: 0, title: "", subtitle: "", reasons: [], risks: [], targetPrice: 0, stopLoss: 0, takeProfit: 0 },
   stats: { total: 0, critical: 0, warning: 0, info: 0, opportunity: 0, success: 0 },
+  // 추가 nested 보호 (BacktestPanel, DailySummaryPanel 등 대응)
+  strategy: { avgReturn: 0, winRate: 0, totalTrades: 0, buckets: [] },
+  benchmark: { avgReturn: 0, symbol: "" },
+  agents: { totalAnalyzed: 0, results: [] },
+  accuracy: { avgMape: 0, avgCoverage: 0, avgDirectionAcc: 0 },
+  dataStats: { totalForecasts: 0, dataHealthScore: 0 },
+  krwAnalysis: { price: 0, change: 0, range: { low: 0, high: 0 } },
+  fxAnalysis: { price: 0, change: 0 },
+  futuresAnalysis: {},
+  bucketAnalysis: {},
+  totalCapital: { usd: 0, krw: 0 },
+  riskMetrics: { overallScore: 0, portfolioValue: 0, beta: 0 },
+  marketState: { regime: "unknown", condition: "" },
+  trades: [],
+  allEvents: [],
+  chartData: [],
+  heatmap: [],
 };
+
+// ───────────────────────────────────────────────────────────
+// Deep merge: undefined/null인 값은 기본값을 유지
+// ───────────────────────────────────────────────────────────
+function deepMergeWithDefaults(defaults: any, data: any): any {
+  if (data === null || data === undefined) return defaults;
+  if (typeof data !== "object" || Array.isArray(data)) return data;
+  
+  const result: any = { ...defaults };
+  for (const key in data) {
+    const val = data[key];
+    if (val === undefined || val === null) {
+      // undefined/null이면 기본값 유지 (배열/객체 보존)
+      if (key in defaults) continue;
+      result[key] = val;
+    } else if (typeof val === "object" && !Array.isArray(val) && key in defaults && typeof defaults[key] === "object" && !Array.isArray(defaults[key])) {
+      // 객체면 재귀
+      result[key] = deepMergeWithDefaults(defaults[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+  return result;
+}
 
 /**
  * 안전한 fetcher (캐시 + 기본값)
@@ -120,7 +161,7 @@ export async function safeFetcher(url: string): Promise<any> {
       const cached = getCache(url);
       if (cached) {
         console.info(`[Cache recovery] ${url} → 최근 캐시 사용`);
-        return { ...EMPTY_DEFAULTS, ...cached, _from_cache: true };
+        return deepMergeWithDefaults(EMPTY_DEFAULTS, { ...cached, _from_cache: true });
       }
       
       return {
@@ -133,7 +174,8 @@ export async function safeFetcher(url: string): Promise<any> {
 
     try {
       const data = await res.json();
-      const merged = { ...EMPTY_DEFAULTS, ...data };
+      // 🔥 deep merge - undefined가 기본값을 덮어쓰지 않음
+      const merged = deepMergeWithDefaults(EMPTY_DEFAULTS, data);
       
       // 📦 성공 응답 캐싱
       if (data && data.success !== false) {
@@ -144,7 +186,7 @@ export async function safeFetcher(url: string): Promise<any> {
     } catch {
       const cached = getCache(url);
       if (cached) {
-        return { ...EMPTY_DEFAULTS, ...cached, _from_cache: true };
+        return deepMergeWithDefaults(EMPTY_DEFAULTS, { ...cached, _from_cache: true });
       }
       return {
         success: false,
@@ -160,7 +202,7 @@ export async function safeFetcher(url: string): Promise<any> {
     const cached = getCache(url);
     if (cached) {
       console.info(`[Cache recovery] ${url} → 네트워크 에러, 캐시 사용`);
-      return { ...EMPTY_DEFAULTS, ...cached, _from_cache: true };
+      return deepMergeWithDefaults(EMPTY_DEFAULTS, { ...cached, _from_cache: true });
     }
     
     return {

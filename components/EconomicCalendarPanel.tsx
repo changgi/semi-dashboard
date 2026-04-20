@@ -89,7 +89,7 @@ export function EconomicCalendarPanel() {
   else if (filter === "high") filtered = data.highImpact;
   else if (filter === "week") filtered = data.nextWeek;
   else if (filter === "month") filtered = data.nextMonth;
-  else filtered = data.allEvents.filter((e) => e.category === filter);
+  else filtered = (data.allEvents ?? []).filter((e) => e.category === filter);
 
   return (
     <div className="panel p-3 sm:p-5">
@@ -113,7 +113,7 @@ export function EconomicCalendarPanel() {
             <div className="text-[10px] tick kr font-bold mb-2 text-[#ff3860]">
               🚨 오늘 발표 ({data.todayEvents.length}건)
             </div>
-            {data.todayEvents.map((e) => (
+            {(data.todayEvents ?? []).map((e) => (
               <div key={e.id} className="text-[10px] kr mb-1">
                 • {e.title} {e.time && <span className="dim">({e.time} {e.timezone})</span>}
               </div>

@@ -347,7 +347,7 @@ export function PortfolioPanel() {
             <div className="mb-4">
               <div className="text-[9px] dim kr mb-1">📊 종목별 비중</div>
               <div className="flex h-3 rounded overflow-hidden border border-[var(--border)]">
-                {data.sectorBreakdown.map((s, i) => {
+                {(data.sectorBreakdown ?? []).map((s, i) => {
                   const colors = [
                     "bg-[#ffb000]", "bg-[#00ff88]", "bg-[#aaccff]",
                     "bg-[#ff8888]", "bg-[#ee99ff]", "bg-[#88ddcc]",
@@ -366,7 +366,7 @@ export function PortfolioPanel() {
                 })}
               </div>
               <div className="flex flex-wrap gap-2 mt-1 text-[7px]">
-                {data.sectorBreakdown.slice(0, 8).map((s) => (
+                {(data.sectorBreakdown ?? []).slice(0, 8).map((s) => (
                   <span key={s.symbol} className="dim">
                     <span className="tick">{s.symbol}</span>: {s.weight.toFixed(1)}%
                   </span>
@@ -395,7 +395,7 @@ export function PortfolioPanel() {
                 </tr>
               </thead>
               <tbody>
-                {data.holdings.map((h) => {
+                {(data.holdings ?? []).map((h) => {
                   // 이름이 의미 있는지 체크 (심볼과 같으면 무시)
                   const hasGoodName = h.name && h.name !== h.symbol && !/^\d+$/.test(h.name);
                   return (

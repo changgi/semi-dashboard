@@ -100,7 +100,7 @@ function MacroChart({
 
   // 히스토리 + 전망 통합 (차트용)
   const chartData = [
-    ...data.history.map((h) => ({
+    ...(data.history ?? []).map((h) => ({
       date: h.date,
       actual: h.value,
       forecast: null as number | null,
@@ -109,7 +109,7 @@ function MacroChart({
       isForecast: false,
     })),
     // 전망치 (첫 포인트는 히스토리 마지막 값과 연결)
-    ...data.forecast.map((f, i) => ({
+    ...(data.forecast ?? []).map((f, i) => ({
       date: f.date,
       actual: null as number | null,
       forecast: i === 0 ? data.current : f.forecast,
@@ -121,9 +121,9 @@ function MacroChart({
 
   // Y축 범위: 전망치 상하단 포함
   const allValues = [
-    ...data.history.map((h) => h.value),
-    ...data.forecast.map((f) => f.upper),
-    ...data.forecast.map((f) => f.lower),
+    ...(data.history ?? []).map((h) => h.value),
+    ...(data.forecast ?? []).map((f) => f.upper),
+    ...(data.forecast ?? []).map((f) => f.lower),
   ];
   const yMin = Math.min(...allValues) * 0.95;
   const yMax = Math.max(...allValues) * 1.05;

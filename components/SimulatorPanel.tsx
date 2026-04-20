@@ -238,7 +238,7 @@ export function SimulatorPanel() {
           {data.insights.length > 0 && (
             <div className="border border-[var(--amber-dim)] bg-[rgba(255,176,0,0.03)] rounded p-3">
               <div className="text-[10px] tick kr font-bold mb-2">💡 핵심 인사이트</div>
-              {data.insights.map((ins, i) => (
+              {(data.insights ?? []).map((ins, i) => (
                 <div key={i} className="text-[10px] kr mb-1 leading-relaxed">{ins}</div>
               ))}
             </div>

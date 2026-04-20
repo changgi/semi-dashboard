@@ -296,7 +296,7 @@ export function OptionsImpactPanel() {
                 🧱 옵션 기반 지지/저항선 (대규모 OI 스트라이크)
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {data.supportResistance.map((lvl, i) => (
+                {(data.supportResistance ?? []).map((lvl, i) => (
                   <div
                     key={i}
                     className={`border-l-2 ${
@@ -330,7 +330,7 @@ export function OptionsImpactPanel() {
                 🔥 비정상 거래 (스마트머니 베팅)
               </div>
               <div className="space-y-1">
-                {data.unusualActivity.map((u, i) => (
+                {(data.unusualActivity ?? []).map((u, i) => (
                   <div
                     key={i}
                     className="flex items-center justify-between border border-[var(--border)] rounded p-2 text-[9px]"

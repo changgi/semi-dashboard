@@ -161,7 +161,7 @@ function NewsSentimentTab() {
             🔥 고영향 뉴스 (중요 키워드 포함)
           </div>
           <div className="space-y-1">
-            {data.highImpact.slice(0, 5).map((n: any) => (
+            {(data.highImpact ?? []).slice(0, 5).map((n: any) => (
               <div
                 key={n.id}
                 className="border-l-3 rounded-r p-2 hover:bg-[rgba(255,255,255,0.02)]"

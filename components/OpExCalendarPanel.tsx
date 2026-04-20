@@ -111,8 +111,8 @@ export function OpExCalendarPanel() {
   // 필터링
   const filteredEvents = (() => {
     if (filterType === "all") return data.events;
-    if (filterType === "major") return data.events.filter((e) => e.importance >= 4);
-    if (filterType === "this_month") return data.events.filter((e) => e.daysUntil <= 30);
+    if (filterType === "major") return (data.events ?? []).filter((e) => e.importance >= 4);
+    if (filterType === "this_month") return (data.events ?? []).filter((e) => e.daysUntil <= 30);
     return data.events;
   })();
 
@@ -142,7 +142,7 @@ export function OpExCalendarPanel() {
             🎯 TRADING SIGNALS · 지금 할 일 ({data.tradingSignals.length}건)
           </div>
           <div className="space-y-1.5">
-            {data.tradingSignals.slice(0, 3).map((sig, i) => (
+            {(data.tradingSignals ?? []).slice(0, 3).map((sig, i) => (
               <TradingSignalRow key={i} signal={sig} />
             ))}
           </div>
@@ -156,7 +156,7 @@ export function OpExCalendarPanel() {
             📆 이번 주 만기 ({data.thisWeek.length}건)
           </div>
           <div className="flex flex-wrap gap-2">
-            {data.thisWeek.map((e) => (
+            {(data.thisWeek ?? []).map((e) => (
               <button
                 key={e.date}
                 onClick={() => setSelectedEvent(e)}

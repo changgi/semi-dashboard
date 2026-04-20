@@ -149,7 +149,7 @@ export function InvestmentAdvisor() {
         <div className="border border-[var(--amber-dim)] bg-[rgba(255,176,0,0.03)] rounded p-2">
           <div className="text-[10px] tick font-bold kr mb-1.5">💡 핵심 통찰</div>
           <ul className="space-y-1">
-            {data.keyInsights.map((ins, i) => (
+            {(data.keyInsights ?? []).map((ins, i) => (
               <li key={i} className="text-[9px] dim kr leading-relaxed flex gap-1">
                 <span className="text-[var(--amber)]">•</span>
                 <span>{ins}</span>
@@ -165,7 +165,7 @@ export function InvestmentAdvisor() {
           </div>
           {data.opportunities.length > 0 ? (
             <ul className="space-y-1">
-              {data.opportunities.map((o, i) => (
+              {(data.opportunities ?? []).map((o, i) => (
                 <li key={i} className="text-[9px] dim kr leading-relaxed flex gap-1">
                   <span className="text-[#00ff88]">↗</span>
                   <span>{o}</span>
@@ -184,7 +184,7 @@ export function InvestmentAdvisor() {
           </div>
           {data.riskFactors.length > 0 ? (
             <ul className="space-y-1">
-              {data.riskFactors.map((r, i) => (
+              {(data.riskFactors ?? []).map((r, i) => (
                 <li key={i} className="text-[9px] dim kr leading-relaxed flex gap-1">
                   <span className="text-[#ff3860]">↘</span>
                   <span>{r}</span>
@@ -233,7 +233,7 @@ export function InvestmentAdvisor() {
           🎯 ACTION ITEMS · 오늘 할 일 ({data.actions.length}건)
         </div>
         <div className="space-y-2">
-          {data.actions.map((action, idx) => {
+          {(data.actions ?? []).map((action, idx) => {
             const catStyle = categoryStyles[action.category];
             const priorStyle = priorityStyles[action.priority];
             const riskStyle = riskStyles[action.riskLevel];

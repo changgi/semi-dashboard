@@ -345,7 +345,7 @@ export function KoreaSemiPanel() {
       {/* 시그널 */}
       {data.signals.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
-          {data.signals.map((sig, i) => (
+          {(data.signals ?? []).map((sig, i) => (
             <div
               key={i}
               className={`border-l-2 rounded-r p-2 ${
