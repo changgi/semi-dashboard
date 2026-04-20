@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 // 섹션 정의 (page.tsx의 id와 매칭)
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
+  { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },

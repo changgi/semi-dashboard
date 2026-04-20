@@ -58,6 +58,8 @@ import { SimulatorPanel } from "@/components/SimulatorPanel";
 import { ToolboxPanel } from "@/components/ToolboxPanel";
 import { UrgentEventBanner } from "@/components/UrgentEventBanner";
 import { EarningsMonitorPanel } from "@/components/EarningsMonitorPanel";
+import { PositionGuidePanel } from "@/components/PositionGuidePanel";
+import { PushNotifications } from "@/components/PushNotifications";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -173,6 +175,13 @@ export default function Dashboard() {
         <div className="col-span-12">
           <PanelErrorBoundary panelName="Urgent Events" compact>
             <UrgentEventBanner />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🧠 POSITION GUIDE - AI 종합 판단 + 지금 뭐 해야 하나? */}
+        <div id="position-guide" className="col-span-12">
+          <PanelErrorBoundary panelName="Position Guide">
+            <PositionGuidePanel />
           </PanelErrorBoundary>
         </div>
 
@@ -517,6 +526,9 @@ export default function Dashboard() {
 
       {/* 🎯 플로팅 결정 바 - 하단 항상 표시 */}
       <FloatingDecisionBar />
+
+      {/* 🔔 푸시 알림 - 우하단 플로팅 버튼 */}
+      <PushNotifications />
     </div>
   );
 }

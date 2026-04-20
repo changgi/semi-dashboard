@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchYahooQuotes, fetchYahooHistory } from "@/lib/yahoo";
+import { createAdmin } from "@/lib/supabase";
 
 export const revalidate = 900; // 15분
 export const dynamic = "force-dynamic";
@@ -97,20 +98,42 @@ function computeVolatility(prices: number[]): number {
 }
 
 // ───────────────────────────────────────────────────────────
-// 포트폴리오 관련성 판단
+// 포트폴리오 관련성 판단 (강화된 로직)
 // ───────────────────────────────────────────────────────────
 function determineImpact(symbol: string, affectedETFs: string[], portfolioSymbols: Set<string>): "direct" | "indirect" | "none" {
-  // 직접 보유
+  // 1. 직접 보유
   if (portfolioSymbols.has(symbol)) return "direct";
   
-  // ETF 통해 간접 영향
+  // 2. 영향 ETF 직접 보유
   for (const etf of affectedETFs) {
     if (portfolioSymbols.has(etf)) return "indirect";
   }
   
-  // TIGER S&P500 보유 시 SPY 영향 종목들은 간접
-  const tigerSP = Array.from(portfolioSymbols).find(s => s.includes("360750") || s === "SPY");
-  if (tigerSP && affectedETFs.includes("SPY")) return "indirect";
+  // 3. 한국 ETF → 미국 ETF 매핑
+  const portfolioArr = Array.from(portfolioSymbols);
+  
+  for (const p of portfolioArr) {
+    // TIGER/KODEX S&P500 계열 (360750.KS, 379800.KS 등) → SPY 연동
+    const isSP500ETF = p.includes("360750") || p.includes("379800") || p.includes("TIGER") && p.toLowerCase().includes("s&p");
+    if (isSP500ETF && (affectedETFs.includes("SPY") || affectedETFs.includes("QQQ"))) {
+      return "indirect";
+    }
+    
+    // KODEX 나스닥100 (379810.KS 등) → QQQ 연동
+    if ((p.includes("379810") || p.includes("133690")) && affectedETFs.includes("QQQ")) {
+      return "indirect";
+    }
+    
+    // TIGER 반도체 (139260.KS), KODEX 반도체 (091160.KS) → SMH/SOXX 연동
+    if ((p.includes("139260") || p.includes("091160")) && (affectedETFs.includes("SMH") || affectedETFs.includes("SOXX"))) {
+      return "indirect";
+    }
+    
+    // 삼성전자/SK하이닉스 → 반도체 ETF 실적 영향
+    if ((p.includes("005930") || p.includes("000660")) && (affectedETFs.includes("SMH") || affectedETFs.includes("SOXX"))) {
+      return "indirect";
+    }
+  }
   
   return "none";
 }
@@ -188,19 +211,20 @@ export async function GET() {
   try {
     const today = new Date();
     
-    // 포트폴리오 보유 종목 (카일님 포지션)
-    let portfolioSymbols = new Set<string>();
+    // 포트폴리오 보유 종목 (카일님 포지션) - Supabase 직접 조회
+    const portfolioSymbols = new Set<string>();
     try {
-      const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
-      const res = await fetch(`${baseUrl}/api/portfolio`, { signal: AbortSignal.timeout(10000) });
-      if (res.ok) {
-        const p = await res.json();
-        for (const h of p.holdings ?? []) {
-          portfolioSymbols.add(h.symbol);
-        }
+      const supabase = createAdmin();
+      const { data: holdings } = await supabase
+        .from("portfolio_holdings")
+        .select("symbol")
+        .eq("is_active", true);
+      
+      for (const h of holdings ?? []) {
+        portfolioSymbols.add(h.symbol);
       }
-    } catch {
-      // 포트폴리오 없어도 진행
+    } catch (e) {
+      console.warn("[earnings-monitor] 포트폴리오 조회 실패", e);
     }
 
     // 7일 이내 + 이미 지난 3일 이내 실적만 (최근 결과도 포함)
