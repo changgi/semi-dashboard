@@ -61,6 +61,8 @@ import { EarningsMonitorPanel } from "@/components/EarningsMonitorPanel";
 import { PositionGuidePanel } from "@/components/PositionGuidePanel";
 import { PushNotifications } from "@/components/PushNotifications";
 import { StrategyAssistantPanel } from "@/components/StrategyAssistantPanel";
+import { WeeklyStrategyPanel } from "@/components/WeeklyStrategyPanel";
+import { OrderSlipPanel } from "@/components/OrderSlipPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -190,6 +192,20 @@ export default function Dashboard() {
         <div id="strategy-assistant" className="col-span-12">
           <PanelErrorBoundary panelName="Strategy Assistant">
             <StrategyAssistantPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📅 WEEKLY STRATEGY - 이번 주 종합 전략 */}
+        <div id="weekly-strategy" className="col-span-12">
+          <PanelErrorBoundary panelName="Weekly Strategy">
+            <WeeklyStrategyPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📝 ORDER SLIP - 실행 가능한 주문서 */}
+        <div id="order-slip" className="col-span-12">
+          <PanelErrorBoundary panelName="Order Slip">
+            <OrderSlipPanel />
           </PanelErrorBoundary>
         </div>
 
