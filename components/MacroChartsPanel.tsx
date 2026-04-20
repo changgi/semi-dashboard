@@ -15,7 +15,8 @@ import {
   ReferenceArea,
 } from "recharts";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
 // 추적할 매크로 지표

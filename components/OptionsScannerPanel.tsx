@@ -2,7 +2,8 @@
 
 import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 interface ScanSymbol {
   symbol: string;

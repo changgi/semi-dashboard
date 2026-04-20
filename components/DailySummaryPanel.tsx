@@ -3,7 +3,8 @@
 import useSWR from "swr";
 import { SkeletonBar, SkeletonCards } from "./Skeleton";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
 // 타입

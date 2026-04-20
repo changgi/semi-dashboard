@@ -6,7 +6,8 @@ import {
   CartesianGrid, Tooltip, Cell, ReferenceLine,
 } from "recharts";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 interface NewsItem {
   title: string;

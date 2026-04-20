@@ -8,7 +8,8 @@ import {
   CartesianGrid, ZAxis, Cell, BarChart, Bar,
 } from "recharts";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 interface AnalysisRow {
   symbol: string;

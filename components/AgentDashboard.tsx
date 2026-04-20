@@ -4,7 +4,8 @@ import { useState } from "react";
 import useSWR from "swr";
 import { fmtPrice } from "@/lib/format";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 type Vote = "STRONG_BUY" | "BUY" | "HOLD" | "SELL" | "STRONG_SELL";
 

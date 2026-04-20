@@ -5,7 +5,8 @@ import useSWR from "swr";
 import type { NewsItem } from "@/lib/types";
 import { relativeTime } from "@/lib/format";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 export function NewsFeed({ symbol }: { symbol?: string }) {
   const url = symbol

@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
 // 타입

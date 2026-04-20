@@ -8,7 +8,8 @@ import {
 } from "recharts";
 import { fmtPrice, fmtPct } from "@/lib/format";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 interface Prediction {
   symbol: string;

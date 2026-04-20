@@ -52,9 +52,14 @@ import { DailyBriefingPanel } from "@/components/DailyBriefingPanel";
 import { SectorScannerPanel } from "@/components/SectorScannerPanel";
 import { AlertFeedPanel } from "@/components/AlertFeedPanel";
 import { ExecutionPlanPanel } from "@/components/ExecutionPlanPanel";
+import { JournalPanel } from "@/components/JournalPanel";
+import { EconomicCalendarPanel } from "@/components/EconomicCalendarPanel";
+import { SimulatorPanel } from "@/components/SimulatorPanel";
+import { ToolboxPanel } from "@/components/ToolboxPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
+import { CacheStatusBanner } from "@/components/CacheStatusBanner";
 import { PanelErrorBoundary } from "@/components/PanelErrorBoundary";
 import { DataHealthDashboard } from "@/components/DataHealthDashboard";
 
@@ -113,6 +118,7 @@ export default function Dashboard() {
       <TopBar isConnected={isConnected} />
       <RecommendationTicker />
       <HotActionsBar />
+      <CacheStatusBanner />
       <LiveTicker rows={rows} />
 
       {/* ═══════════════ HERO ═══════════════ */}
@@ -179,6 +185,34 @@ export default function Dashboard() {
         <div id="execution-plan" className="col-span-12">
           <PanelErrorBoundary panelName="Execution Plan">
             <ExecutionPlanPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📅 ECONOMIC CALENDAR - 경제 이벤트 캘린더 */}
+        <div id="economic-calendar" className="col-span-12">
+          <PanelErrorBoundary panelName="Economic Calendar">
+            <EconomicCalendarPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📔 INVESTMENT JOURNAL - 투자 일지 & 성과 추적 */}
+        <div id="journal" className="col-span-12">
+          <PanelErrorBoundary panelName="Journal">
+            <JournalPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🎮 PORTFOLIO SIMULATOR - What If? 시나리오 분석 */}
+        <div id="simulator" className="col-span-12">
+          <PanelErrorBoundary panelName="Simulator">
+            <SimulatorPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🛠️ INVESTMENT TOOLBOX - 뉴스/이메일/Export */}
+        <div id="toolbox" className="col-span-12">
+          <PanelErrorBoundary panelName="Toolbox">
+            <ToolboxPanel />
           </PanelErrorBoundary>
         </div>
 

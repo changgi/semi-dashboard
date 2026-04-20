@@ -9,6 +9,10 @@ const SECTIONS = [
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
   { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },
+  { id: "economic-calendar",icon: "📅", label: "경제 캘린더",      group: "daily" },
+  { id: "journal",          icon: "📔", label: "투자 일지",        group: "daily" },
+  { id: "simulator",        icon: "🎮", label: "시뮬레이터",       group: "daily" },
+  { id: "toolbox",          icon: "🛠️", label: "툴박스",           group: "daily" },
   { id: "unified-insight",  icon: "🎯", label: "통합 인사이트",    group: "daily" },
   { id: "sector-scanner",   icon: "🔍", label: "섹터 스캐너",      group: "daily" },
   { id: "today-view",       icon: "🎯", label: "오늘의 View",     group: "daily" },
@@ -99,14 +103,14 @@ export function SideNavigation() {
 
   return (
     <div
-      className="fixed right-2 top-1/2 -translate-y-1/2 z-30 flex flex-col items-end gap-1"
+      className="fixed right-1 sm:right-2 top-1/2 -translate-y-1/2 z-30 flex flex-col items-end gap-1 sidebar-hide-on-mobile"
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
       {/* 상단 이동 버튼 */}
       <button
         onClick={scrollToTop}
-        className="w-8 h-8 rounded-full border border-[var(--amber-dim)] bg-[var(--bg)]/80 backdrop-blur hover:bg-[rgba(255,176,0,0.1)] text-[var(--amber)] text-[10px] flex items-center justify-center shadow transition-all mb-2"
+        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[var(--amber-dim)] bg-[var(--bg)]/80 backdrop-blur hover:bg-[rgba(255,176,0,0.1)] text-[var(--amber)] text-[10px] flex items-center justify-center shadow transition-all mb-2"
         title="최상단으로"
       >
         ↑

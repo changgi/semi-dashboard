@@ -4,7 +4,8 @@ import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { SkeletonBar, SkeletonCards, SkeletonTable } from "./Skeleton";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
 // 타입

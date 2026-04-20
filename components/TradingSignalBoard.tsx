@@ -4,7 +4,8 @@ import { useState } from "react";
 import useSWR from "swr";
 import { fmtPrice, fmtPct } from "@/lib/format";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { safeFetcher } from "@/lib/swr-config";
+const fetcher = safeFetcher;
 
 interface Signal {
   symbol: string;

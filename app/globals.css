@@ -382,3 +382,166 @@ body::after {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   📱 모바일 최적화 (Mobile Optimizations)
+   ═══════════════════════════════════════════════════════════ */
+
+/* iOS 안전 영역 (노치) 대응 */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* 모바일 터치 최적화 - 최소 터치 영역 44x44 */
+@media (max-width: 640px) {
+  button,
+  a,
+  select,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 36px;  /* 접근성 권장 44px, 밀집도 고려 36px */
+  }
+
+  /* 모바일에서 overflow-x 컨테이너에 smooth 스크롤 + 터치 관성 */
+  .overflow-x-auto,
+  .scrollbar-none {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 모바일에서 패널 코너 장식 작게 (화면 공간 절약) */
+  .panel::before,
+  .panel::after {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* 섹션 타이틀 간격 좁힘 */
+  .section-title {
+    letter-spacing: 0.15em;
+  }
+
+  /* 모바일에서 스크롤바 최소화 */
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  /* 테이블 모바일에서 가로 스크롤 가능하게 (하지만 최소한의 간격 유지) */
+  table {
+    font-size: 10px;
+  }
+
+  /* 카드형 컨텐츠는 모바일에서 조금 더 촘촘하게 */
+  .panel {
+    font-size: 12px;
+  }
+
+  /* 모바일에서 input 줌 방지 (iOS 16px 이하일 때 자동 줌) */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* 네비게이션/바 고정 요소는 살짝 얇게 */
+  .sticky {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* 모바일 그리드 gap 축소 */
+  .gap-2 { gap: 0.375rem !important; }
+  .gap-3 { gap: 0.5rem !important; }
+
+  /* 모달/팝업 모바일에서 풀스크린 모드로 */
+  .modal-backdrop {
+    padding: 1rem;
+  }
+}
+
+/* 초소형 화면 (360px 이하) */
+@media (max-width: 360px) {
+  html, body {
+    font-size: 11px;
+  }
+
+  .panel::before,
+  .panel::after {
+    display: none; /* 공간 절약 */
+  }
+
+  /* 사이드 네비 숨김 (메뉴 버튼으로 대체) */
+  .sidebar-hide-on-mobile {
+    display: none;
+  }
+}
+
+/* 태블릿 중간 사이즈 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .panel {
+    padding: 1rem;
+  }
+}
+
+/* 가로 모드 모바일 특수 처리 */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  /* 헤더는 sticky하되 축소 */
+  .sticky-compact {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+}
+
+/* 모바일에서 Recharts 차트 반응형 */
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 10px !important;
+  }
+  .recharts-cartesian-axis-tick-value {
+    font-size: 9px !important;
+  }
+  .recharts-legend-item-text {
+    font-size: 10px !important;
+  }
+}
+
+/* 모바일 iframe (이메일 미리보기) 크기 조정 */
+@media (max-width: 640px) {
+  iframe {
+    max-width: 100%;
+  }
+}
+
+/* 터치 디바이스에서 hover 상태 비활성화 (끈적임 방지) */
+@media (hover: none) {
+  button:hover,
+  a:hover {
+    background: inherit;
+  }
+}
+
+/* 다크모드 선호 반영 (이미 다크지만 명시) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* 모션 감소 선호 (접근성) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .pulse-dot,
+  .blink,
+  .ticker-scroll,
+  .scan::after {
+    animation: none !important;
+  }
+}
