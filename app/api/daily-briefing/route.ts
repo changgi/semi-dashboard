@@ -385,7 +385,27 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      reportDate: new Date().toISOString().split("T")[0],
+      executiveSummary: {
+        headline: "데이터를 일시적으로 불러올 수 없습니다",
+        todayAction: "대기",
+        actionColor: "#888",
+        actionIcon: "⏸️",
+        urgency: "normal",
+        confidence: 0,
+        keyPoints: ["잠시 후 새로고침해주세요"],
+      },
+      actionItems: [],
+      portfolioSummary: { totalValueUsd: 0, totalGainPct: 0, positionCount: 0, riskScore: 0 },
+      symbolSignals: [],
+      macro: { vix: null, tnx: null, krw: 1470, dxy: null, oil: null, vixRegime: "unknown" },
+      todayEvents: [],
+      nextOpEx: null,
+      error: msg,
+      _soft_failure: true,
+    });
   }
 }
 

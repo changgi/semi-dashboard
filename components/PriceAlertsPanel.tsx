@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
+import { safeFetcher } from "@/lib/swr-config";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+// 안전한 fetcher: 500/503 에러 시에도 빈 데이터 반환하여 UI 크래시 방지
+const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
 // 타입

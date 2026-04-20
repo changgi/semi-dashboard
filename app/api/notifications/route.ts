@@ -432,6 +432,14 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    // ⚠️ 500 대신 200 + 빈 데이터 → UI 크래시 방지
+    return NextResponse.json({
+      success: true,
+      notifications: [],
+      stats: { total: 0, critical: 0, warning: 0, info: 0, opportunity: 0, success: 0 },
+      error: msg,
+      _soft_failure: true,
+      timestamp: new Date().toISOString(),
+    });
   }
 }

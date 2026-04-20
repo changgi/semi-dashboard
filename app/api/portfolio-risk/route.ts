@@ -454,6 +454,22 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    // ⚠️ 500 대신 안전한 기본값
+    return NextResponse.json({
+      success: true,
+      totalValueUsd: 0,
+      overallRiskScore: 0,
+      overallRiskLabel: "낮음",
+      overallColor: "#00ff88",
+      weightedBullishScore: 0,
+      dominantDirection: "neutral",
+      positions: [],
+      topRisks: [],
+      topOpportunities: [],
+      recommendedActions: [],
+      error: msg,
+      _soft_failure: true,
+      timestamp: new Date().toISOString(),
+    });
   }
 }

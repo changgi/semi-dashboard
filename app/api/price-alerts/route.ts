@@ -131,7 +131,17 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    // ⚠️ 중요: 500 대신 200 + 빈 배열 반환
+    //    → UI가 크래시하지 않고 "알림 없음" 상태로 표시됨
+    //    → DNS 오류 등 일시적 문제에도 대시보드 전체가 죽지 않음
+    return NextResponse.json({
+      success: true,
+      alerts: [],
+      triggered: [],
+      error: msg,
+      _soft_failure: true,
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 

@@ -380,6 +380,17 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      scannedCount: 0,
+      sectorSentiment: { bullish: 0, bearish: 0, neutral: 0, avgScore: 0, positiveGex: 0, negativeGex: 0 },
+      sectorDirection: "혼조",
+      results: { strongBuys: [], buys: [], neutrals: [], sells: [], strongSells: [] },
+      unusualActivity: [],
+      gammaSqueezeCandidates: [],
+      allResults: [],
+      error: msg,
+      _soft_failure: true,
+    });
   }
 }
