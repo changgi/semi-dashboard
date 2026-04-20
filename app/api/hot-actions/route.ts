@@ -159,6 +159,15 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    // 500 대신 soft failure
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      score: { value: 50, label: "데이터 로딩", color: "amber" },
+      metrics: { vix: null, krw: null, soxx: null },
+      portfolio: null,
+      alerts: [],
+    });
   }
 }

@@ -9,7 +9,25 @@
 // ═══════════════════════════════════════════════════════════
 
 const CACHE_PREFIX = "semi_cache_";
+const CACHE_VERSION = "v3";  // 캐시 포맷 변경 시 증가
+const CACHE_VERSION_KEY = "semi_cache_version";
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30분
+
+// 앱 로드 시 캐시 버전 체크 - 구버전 데이터 전부 삭제
+if (typeof window !== "undefined") {
+  try {
+    const currentVersion = localStorage.getItem(CACHE_VERSION_KEY);
+    if (currentVersion !== CACHE_VERSION) {
+      // 버전 불일치 → 전체 캐시 초기화
+      const keys = Object.keys(localStorage).filter((k) => k.startsWith(CACHE_PREFIX));
+      for (const k of keys) localStorage.removeItem(k);
+      localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
+      console.info(`[Cache] 버전 업그레이드: ${currentVersion} → ${CACHE_VERSION}, ${keys.length}개 캐시 삭제`);
+    }
+  } catch {
+    // 무시
+  }
+}
 
 interface CacheEntry {
   data: any;
@@ -83,7 +101,9 @@ const EMPTY_DEFAULTS: Record<string, any> = {
   insights: [],
   news: [], comparisons: [],
   items: [], list: [], rows: [],
-  results: { strongBuys: [], buys: [], neutrals: [], sells: [], strongSells: [] },
+  // ⚠️ results는 API마다 구조가 다름 (SectorScanner=객체, Simulator=배열)
+  // 그래서 기본값 없이 각 컴포넌트에서 개별 체크
+  // (과거에 results를 객체로 박아놔서 배열 기대하는 API에서 크래시했음)
   summary: { keyRecommendations: [], executionOrder: [], totalBuyAmount: 0, totalSellAmount: 0, netFlow: 0 },
   overallStats: { total: 0, accuracy1d: 0, accuracy7d: 0, accuracy30d: 0, avgMaxGain: 0, avgMaxLoss: 0 },
   directionStats: { upSignals: { total: 0, accuracy: 0 }, downSignals: { total: 0, accuracy: 0 } },

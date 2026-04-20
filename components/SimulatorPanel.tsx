@@ -232,10 +232,10 @@ export function SimulatorPanel() {
       </div>
 
       {/* ═════════ 결과 ═════════ */}
-      {data && data.results.length > 0 && (
+      {data && (data.results?.length ?? 0) > 0 && (
         <div className="space-y-3">
           {/* 인사이트 */}
-          {data.insights.length > 0 && (
+          {(data.insights?.length ?? 0) > 0 && (
             <div className="border border-[var(--amber-dim)] bg-[rgba(255,176,0,0.03)] rounded p-3">
               <div className="text-[10px] tick kr font-bold mb-2">💡 핵심 인사이트</div>
               {(data.insights ?? []).map((ins, i) => (
@@ -315,7 +315,7 @@ function ComparisonChart({ results }: { results: SimResult[] }) {
             <XAxis
               dataKey="date"
               tick={{ fontSize: 9, fill: "#888" }}
-              tickFormatter={(d) => d.slice(5)}
+              tickFormatter={(d) => (d ?? "").slice(5)}
             />
             <YAxis tick={{ fontSize: 9, fill: "#888" }} />
             <Tooltip

@@ -94,12 +94,13 @@ export function SectorScannerPanel() {
   }
 
   // 방어: results 내 배열이 모두 존재하도록 보장
+  const rawResults = data.results ?? {};
   const results = {
-    strongBuys: data.results.strongBuys ?? [],
-    buys: data.results.buys ?? [],
-    neutrals: data.results.neutrals ?? [],
-    sells: data.results.sells ?? [],
-    strongSells: data.results.strongSells ?? [],
+    strongBuys: rawResults.strongBuys ?? [],
+    buys: rawResults.buys ?? [],
+    neutrals: rawResults.neutrals ?? [],
+    sells: rawResults.sells ?? [],
+    strongSells: rawResults.strongSells ?? [],
   };
   const unusualActivity = data.unusualActivity ?? [];
   const gammaSqueezeCandidates = data.gammaSqueezeCandidates ?? [];

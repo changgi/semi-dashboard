@@ -56,6 +56,7 @@ import { JournalPanel } from "@/components/JournalPanel";
 import { EconomicCalendarPanel } from "@/components/EconomicCalendarPanel";
 import { SimulatorPanel } from "@/components/SimulatorPanel";
 import { ToolboxPanel } from "@/components/ToolboxPanel";
+import { UrgentEventBanner } from "@/components/UrgentEventBanner";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -166,6 +167,13 @@ export default function Dashboard() {
 
       {/* ═══════════════ MAIN GRID ═══════════════ */}
       <div className="px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-12 gap-3 sm:gap-5">
+
+        {/* 🚨 URGENT EVENT BANNER - D-3 이내 중요 이벤트 경고 */}
+        <div className="col-span-12">
+          <PanelErrorBoundary panelName="Urgent Events" compact>
+            <UrgentEventBanner />
+          </PanelErrorBoundary>
+        </div>
 
         {/* ☕ MORNING BRIEFING - 매일 아침 5분 종합 브리핑 (최상단) */}
         <div id="daily-briefing" className="col-span-12">
