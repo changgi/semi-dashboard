@@ -64,6 +64,7 @@ import { StrategyAssistantPanel } from "@/components/StrategyAssistantPanel";
 import { WeeklyStrategyPanel } from "@/components/WeeklyStrategyPanel";
 import { OrderSlipPanel } from "@/components/OrderSlipPanel";
 import { KoreaLensPanel } from "@/components/KoreaLensPanel";
+import { MorningBriefPanel } from "@/components/MorningBriefPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -179,6 +180,13 @@ export default function Dashboard() {
         <div className="col-span-12">
           <PanelErrorBoundary panelName="Urgent Events" compact>
             <UrgentEventBanner />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* ☀️ MORNING BRIEF - 3분 요약 (대시보드 최상단!) */}
+        <div id="morning-brief" className="col-span-12">
+          <PanelErrorBoundary panelName="Morning Brief">
+            <MorningBriefPanel />
           </PanelErrorBoundary>
         </div>
 
