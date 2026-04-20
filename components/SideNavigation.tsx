@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 const SECTIONS = [
   { id: "daily-briefing",   icon: "☕", label: "모닝 브리핑",      group: "daily" },
   { id: "alert-feed",       icon: "🔔", label: "알림 피드",        group: "daily" },
+  { id: "execution-plan",   icon: "📋", label: "실행 플랜",        group: "daily" },
   { id: "unified-insight",  icon: "🎯", label: "통합 인사이트",    group: "daily" },
   { id: "sector-scanner",   icon: "🔍", label: "섹터 스캐너",      group: "daily" },
   { id: "today-view",       icon: "🎯", label: "오늘의 View",     group: "daily" },

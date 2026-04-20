@@ -51,6 +51,7 @@ import { PortfolioRiskPanel } from "@/components/PortfolioRiskPanel";
 import { DailyBriefingPanel } from "@/components/DailyBriefingPanel";
 import { SectorScannerPanel } from "@/components/SectorScannerPanel";
 import { AlertFeedPanel } from "@/components/AlertFeedPanel";
+import { ExecutionPlanPanel } from "@/components/ExecutionPlanPanel";
 import { FloatingDecisionBar } from "@/components/FloatingDecisionBar";
 import { RecommendationTicker } from "@/components/RecommendationTicker";
 import { HotActionsBar } from "@/components/HotActionsBar";
@@ -171,6 +172,13 @@ export default function Dashboard() {
         <div id="alert-feed" className="col-span-12">
           <PanelErrorBoundary panelName="Alert Feed">
             <AlertFeedPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📋 EXECUTION PLAN - 오늘의 주문 리스트 (체크리스트) */}
+        <div id="execution-plan" className="col-span-12">
+          <PanelErrorBoundary panelName="Execution Plan">
+            <ExecutionPlanPanel />
           </PanelErrorBoundary>
         </div>
 
