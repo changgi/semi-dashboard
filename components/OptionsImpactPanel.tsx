@@ -344,7 +344,7 @@ export function OptionsImpactPanel() {
                         {u.type === "콜" ? "📈" : "📉"} ${u.strike} {u.type}
                       </span>
                       <span className="dim text-[8px] kr">
-                        {u.expiry.slice(5)} 만기
+                        {(u.expiry ?? "").slice(5)} 만기
                       </span>
                       <span className="text-[var(--amber)] font-bold">
                         거래량 {u.volume.toLocaleString()}

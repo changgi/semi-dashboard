@@ -77,7 +77,7 @@ export function FloatingDecisionBar() {
                     ✅ 매수 근거 ({dec.reasons.length})
                   </div>
                   <ul className="space-y-1 max-h-32 overflow-y-auto">
-                    {dec.reasons.slice(0, 4).map((r: string, i: number) => (
+                    {(dec.reasons ?? []).slice(0, 4).map((r: string, i: number) => (
                       <li key={i} className="text-[9px] kr leading-relaxed">
                         {r}
                       </li>
@@ -93,7 +93,7 @@ export function FloatingDecisionBar() {
                     ⚠️ 리스크 ({dec.risks.length})
                   </div>
                   <ul className="space-y-1 max-h-32 overflow-y-auto">
-                    {dec.risks.slice(0, 4).map((r: string, i: number) => (
+                    {(dec.risks ?? []).slice(0, 4).map((r: string, i: number) => (
                       <li key={i} className="text-[9px] kr leading-relaxed">
                         {r}
                       </li>

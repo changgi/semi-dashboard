@@ -359,7 +359,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
   // 차트 데이터 준비
   const chartData = priceSeries.map((p) => ({
     date: p.date,
-    dateShort: p.date.slice(5), // MM-DD
+    dateShort: (p.date ?? "").slice(5), // MM-DD
     actual: p.actual,
     forecast: p.isFuture ? p.forecast : null,
     upperBand: p.isFuture ? p.upperBand : null,
@@ -519,7 +519,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
           {events.filter(e => e.importance >= 4).map((ev, i) => (
             <ReferenceLine
               key={`event-${i}`}
-              x={ev.date.slice(5)}
+              x={(ev.date ?? "").slice(5)}
               stroke={ev.type === "quad_witching" ? "#ff3860" : "#ffaa44"}
               strokeWidth={1.2}
               strokeDasharray="3 3"
@@ -540,7 +540,7 @@ function IntegratedChart({ data }: { data: InsightData }) {
             return (
               <ReferenceDot
                 key={`sig-${i}`}
-                x={sig.date.slice(5)}
+                x={(sig.date ?? "").slice(5)}
                 y={sig.targetPrice}
                 r={8}
                 fill={sig.color}
@@ -640,7 +640,7 @@ function SignalTimeline({
                   </span>
                 )}
                 <div className="text-right">
-                  <div className="text-[9px] tick font-bold">{sig.date.slice(5)}</div>
+                  <div className="text-[9px] tick font-bold">{(sig.date ?? "").slice(5)}</div>
                   <div className="text-[8px] dim">
                     {daysUntil === 0 ? "오늘" : `D-${daysUntil}`}
                   </div>

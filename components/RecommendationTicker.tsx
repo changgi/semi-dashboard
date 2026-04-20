@@ -85,7 +85,7 @@ export function RecommendationTicker() {
 
   // Advisor 액션 추가
   if (advisor?.success && advisor.actions) {
-    for (const a of advisor.actions.slice(0, 3)) {
+    for (const a of (advisor.actions ?? []).slice(0, 3)) {
       if (a.priority === "high") {
         recommendations.push({
           symbol: "ACTION",
@@ -133,7 +133,7 @@ export function RecommendationTicker() {
                   {item.symbol}
                 </span>
                 <span className="text-[10px] dim kr">
-                  {item.name.length > 20 ? item.name.slice(0, 20) + "…" : item.name}
+                  {(item.name ?? "").length > 20 ? (item.name ?? "").slice(0, 20) + "…" : (item.name ?? "-")}
                 </span>
                 {item.price !== undefined && (
                   <span className="text-[10px] tick">
@@ -160,7 +160,7 @@ export function RecommendationTicker() {
                   {item.confidence}%
                 </span>
                 <span className="text-[9px] dim kr opacity-70">
-                  · {item.reason.slice(0, 40)}
+                  · {(item.reason ?? "").slice(0, 40)}
                 </span>
                 <span className="text-[14px] dim ml-4">•</span>
               </a>

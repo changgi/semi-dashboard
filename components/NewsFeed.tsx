@@ -72,7 +72,7 @@ export function NewsFeed({ symbol }: { symbol?: string }) {
                     <>
                       <span>·</span>
                       <span className="flex gap-1">
-                        {n.related_symbols.slice(0, 3).map((s) => (
+                        {(n.related_symbols ?? []).slice(0, 3).map((s) => (
                           <span
                             key={s}
                             className="px-1 border border-[var(--border-bright)] text-[var(--amber)]"

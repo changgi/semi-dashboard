@@ -610,7 +610,7 @@ function GammaSqueezeTab({ results }: { results: ScanResult[] }) {
               </div>
 
               <div className="space-y-1">
-                {r.opportunities.slice(0, 2).map((o, i) => (
+                {(r.opportunities ?? []).slice(0, 2).map((o, i) => (
                   <div key={i} className="text-[9px] kr text-[#ee99ff]">
                     {o}
                   </div>

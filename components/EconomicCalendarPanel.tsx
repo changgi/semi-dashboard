@@ -325,8 +325,8 @@ function EventCard({ event: e }: { event: EconomicEvent }) {
               {e.time && <span className="dim">{e.time} {e.timezone}</span>}
               <span className="dim">·</span>
               <span className="kr">
-                관련: {e.affectedSymbols.slice(0, 3).join(", ")}
-                {e.affectedSymbols.length > 3 && ` 외 ${e.affectedSymbols.length - 3}개`}
+                관련: {(e.affectedSymbols ?? []).slice(0, 3).join(", ")}
+                {(e.affectedSymbols ?? []).length > 3 && ` 외 ${(e.affectedSymbols ?? []).length - 3}개`}
               </span>
             </div>
           </div>
@@ -372,7 +372,7 @@ function EventCard({ event: e }: { event: EconomicEvent }) {
           </div>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[8px] dim kr">영향 종목:</span>
-            {e.affectedSymbols.map((sym) => (
+            {(e.affectedSymbols ?? []).map((sym) => (
               <a
                 key={sym}
                 href={`/stock/${encodeURIComponent(sym)}`}

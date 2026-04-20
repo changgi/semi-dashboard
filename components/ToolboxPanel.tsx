@@ -189,9 +189,9 @@ function NewsSentimentTab() {
                     {n.score > 0 ? "+" : ""}{n.score}
                   </span>
                 </div>
-                {n.keywords && n.keywords.length > 0 && (
+                {n.keywords && (n.keywords ?? []).length > 0 && (
                   <div className="text-[8px] dim mt-1">
-                    키워드: {n.keywords.slice(0, 3).join(", ")}
+                    키워드: {(n.keywords ?? []).slice(0, 3).join(", ")}
                   </div>
                 )}
               </div>

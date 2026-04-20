@@ -575,7 +575,7 @@ function TrendTab({ trend }: { trend: Array<{ date: string; value: number; gainP
             const gainColor = (t.gainPct ?? 0) >= 0 ? "#00ff88" : "#ff3860";
             return (
               <div key={t.date} className="flex items-center gap-2">
-                <span className="text-[9px] dim w-20">{t.date.slice(5)}</span>
+                <span className="text-[9px] dim w-20">{(t.date ?? "").slice(5)}</span>
                 <div className="flex-1 h-4 bg-[var(--border)] rounded overflow-hidden relative">
                   <div
                     className="h-full transition-all"

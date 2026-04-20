@@ -162,7 +162,7 @@ export function OpExCalendarPanel() {
                 onClick={() => setSelectedEvent(e)}
                 className={`text-[9px] px-2 py-0.5 border rounded kr ${typeColors[e.type].border} ${typeColors[e.type].text}`}
               >
-                {e.date.slice(5)} ({e.dayName}) · {e.typeLabel}
+                {(e.date ?? "").slice(5)} ({e.dayName}) · {e.typeLabel}
               </button>
             ))}
           </div>
@@ -304,7 +304,7 @@ function TradingSignalRow({ signal }: { signal: TradingSignal }) {
         <div className="text-right flex-shrink-0">
           <div className="text-[8px] dim">목표일</div>
           <div className={`text-[11px] font-bold ${style.color}`}>
-            {signal.targetDate.slice(5)}
+            {(signal.targetDate ?? "").slice(5)}
           </div>
           <div className="text-[8px] dim">
             {signal.daysUntil === 0 ? "오늘" : `D-${signal.daysUntil}`}
@@ -357,7 +357,7 @@ function ExpirationEventRow({
             {event.daysUntil}
           </div>
           <div className="text-[7px] dim kr">
-            {event.date.slice(5)}
+            {(event.date ?? "").slice(5)}
           </div>
         </div>
 

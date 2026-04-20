@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 
 export const metadata: Metadata = {
   title: "SEMI TERMINAL // Real-time Semiconductor Dashboard",
@@ -33,7 +34,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <GlobalErrorBoundary>
+          {children}
+        </GlobalErrorBoundary>
+      </body>
     </html>
   );
 }
