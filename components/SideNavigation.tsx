@@ -10,6 +10,8 @@ const SECTIONS = [
   { id: "portfolio-crud",   icon: "💼", label: "보유종목 관리",    group: "daily" },
   { id: "portfolio-diagnosis", icon: "🩺", label: "포트 진단",      group: "daily" },
   { id: "portfolio-simulator", icon: "🎮", label: "시나리오 시뮬",  group: "daily" },
+  { id: "opportunity-finder",  icon: "🎯", label: "기회 탐지기",    group: "daily" },
+  { id: "recovery-path",       icon: "🔄", label: "복구 경로",      group: "daily" },
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
   { id: "weekly-strategy",  icon: "📅", label: "주간 전략",        group: "daily" },

@@ -72,6 +72,8 @@ import { RebalanceHelperPanel } from "@/components/RebalanceHelperPanel";
 import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
 import { PortfolioDiagnosisPanel } from "@/components/PortfolioDiagnosisPanel";
 import { PortfolioSimulatorPanel } from "@/components/PortfolioSimulatorPanel";
+import { OpportunityFinderPanel } from "@/components/OpportunityFinderPanel";
+import { RecoveryPathPanel } from "@/components/RecoveryPathPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -231,6 +233,26 @@ export default function Dashboard() {
             <div className="text-[11px] tick font-bold kr mb-2">🎮 시나리오 시뮬레이터</div>
             <PanelErrorBoundary panelName="Portfolio Simulator">
               <PortfolioSimulatorPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🎯 OPPORTUNITY FINDER - 매수 기회 자동 탐지 */}
+        <div id="opportunity-finder" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🎯 기회 탐지기 · 수익률 상승 후보</div>
+            <PanelErrorBoundary panelName="Opportunity Finder">
+              <OpportunityFinderPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🔄 RECOVERY PATH - 손실 복구 전략 */}
+        <div id="recovery-path" className="col-span-12 md:col-span-5">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🔄 복구 경로 · 손실 복구 전략</div>
+            <PanelErrorBoundary panelName="Recovery Path">
+              <RecoveryPathPanel />
             </PanelErrorBoundary>
           </div>
         </div>
