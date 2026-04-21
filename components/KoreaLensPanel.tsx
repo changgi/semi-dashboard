@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -190,10 +191,13 @@ export function KoreaLensPanel() {
             {koreanEtfs.slice(0, 6).map(e => (
               <div key={e.symbol} className="border border-[var(--border)] rounded p-2 flex items-center justify-between gap-2 text-[10px]">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="tick font-bold">{e.symbol.replace(".KS", "")}</span>
-                    <span className="kr truncate">{e.name}</span>
-                  </div>
+                  <SymbolDisplay
+                    meta={{ symbol: e.symbol, displayName: e.name }}
+                    size="sm"
+                    variant="inline"
+                    showFlag={true}
+                    showBadges={false}
+                  />
                   <div className="dim kr text-[8px] mt-0.5">
                     ₩{Math.round(e.price).toLocaleString()} · 
                     <span className={e.changePct >= 0 ? "up" : "down"}>

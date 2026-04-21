@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -240,8 +241,13 @@ function OrderCard({ order, format, copied, onCopy }: {
             <span className="text-[13px] font-bold kr" style={{ color: cat.color }}>
               #{order.priority} {order.action}
             </span>
-            <span className="text-[13px] tick font-bold">{order.symbol}</span>
-            <span className="text-[10px] dim kr">({order.name})</span>
+            <SymbolDisplay
+              meta={{ symbol: order.symbol, displayName: order.name }}
+              size="sm"
+              variant="inline"
+              showFlag={true}
+              showBadges={false}
+            />
             <span
               className="text-[8px] px-1.5 py-0.5 rounded font-bold kr"
               style={{ background: urg.color, color: "white" }}

@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { useState } from "react";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -358,11 +359,16 @@ function OrderCard({
             href={`/stock/${encodeURIComponent(order.symbol)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[14px] tick font-bold hover:bright"
+            className="hover:opacity-80"
           >
-            {order.symbol}
+            <SymbolDisplay
+              meta={{ symbol: order.symbol, displayName: order.symbolName }}
+              size="md"
+              variant="inline"
+              showFlag={true}
+              showBadges={false}
+            />
           </a>
-          <span className="text-[10px] dim kr">{order.symbolName}</span>
         </div>
         <div className="flex items-center gap-2">
           <span

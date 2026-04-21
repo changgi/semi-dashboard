@@ -3,6 +3,7 @@
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 // 안전한 fetcher: 500/503 에러 시에도 빈 데이터 반환하여 UI 크래시 방지
 const fetcher = safeFetcher;
@@ -182,10 +183,13 @@ function PendingAlertRow({
     <div className="border border-[var(--border)] rounded p-2 hover:border-[var(--amber-dim)] transition-colors">
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-          <span className="tick font-bold text-[10px]">{alert.symbol}</span>
-          {alert.name && alert.name !== alert.symbol && (
-            <span className="text-[8px] dim kr truncate max-w-[100px]">{alert.name}</span>
-          )}
+          <SymbolDisplay
+            meta={{ symbol: alert.symbol, displayName: alert.name || undefined }}
+            size="sm"
+            variant="inline"
+            showFlag={true}
+            showBadges={false}
+          />
           <span className={`text-[10px] font-bold ${conditionColor}`}>
             {conditionIcon} {getConditionLabel(alert.conditionType, alert.targetValue, alert.currency)}
           </span>
@@ -271,10 +275,13 @@ function TriggeredAlertRow({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
           <span className="text-[#ff8844] text-[11px]">🚨</span>
-          <span className="tick font-bold text-[10px]">{alert.symbol}</span>
-          {alert.name && alert.name !== alert.symbol && (
-            <span className="text-[8px] dim kr truncate max-w-[100px]">{alert.name}</span>
-          )}
+          <SymbolDisplay
+            meta={{ symbol: alert.symbol, displayName: alert.name || undefined }}
+            size="sm"
+            variant="inline"
+            showFlag={true}
+            showBadges={false}
+          />
           <span className="text-[10px] font-bold text-[#ff8844]">
             조건 충족!
           </span>

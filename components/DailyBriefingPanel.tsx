@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -502,9 +503,16 @@ function SymbolRow({ signal: s }: { signal: SymbolSignal }) {
           href={`/stock/${encodeURIComponent(s.symbol)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="tick font-bold hover:bright"
+          className="hover:opacity-80"
         >
-          {s.symbol}
+          <SymbolDisplay
+            meta={{ symbol: s.symbol }}
+            size="sm"
+            variant="inline"
+            showFlag={true}
+            showBadges={false}
+            showName={false}
+          />
         </a>
       </td>
       <td className="text-right py-1.5 px-2 tick">${s.currentPrice.toFixed(2)}</td>

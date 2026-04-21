@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { fmtPrice } from "@/lib/format";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -154,8 +155,15 @@ export function AgentComparisonTable() {
                     className="border-b border-[var(--border)] data-row hover:bg-[rgba(255,255,255,0.02)]"
                   >
                     {/* 종목 */}
-                    <td className="py-2 px-1 tick font-bold sticky left-0 bg-[var(--bg)]">
-                      {r.symbol}
+                    <td className="py-2 px-1 sticky left-0 bg-[var(--bg)]">
+                      <SymbolDisplay
+                        meta={{ symbol: r.symbol }}
+                        size="sm"
+                        variant="inline"
+                        showFlag={true}
+                        showBadges={false}
+                        showName={false}
+                      />
                     </td>
 
                     {/* 현재가 */}

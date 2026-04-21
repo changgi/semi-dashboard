@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdmin } from "@/lib/supabase";
 
 export const revalidate = 300; // 5분
 export const dynamic = "force-dynamic";
@@ -181,23 +182,30 @@ export async function GET(req: Request) {
     // ─────────────────────────────────────────────
     // 7.5. 오늘의 자동 인사이트 (축적 데이터 기반)
     // ─────────────────────────────────────────────
-    const recentInsights: Array<{ title: string; insight: string; category: string; confidence: number }> = [];
+    const recentInsights: Array<{ title: string; insight: string; category: string; confidence: number; symbols?: string[] }> = [];
     try {
-      const insightData = await fetchInternal("/api/research-dashboard", req);
-      if (insightData?.recentFindings) {
-        for (const f of insightData.recentFindings.slice(0, 3)) {
-          // 오늘 생성된 것만
-          if (f.date === dateStr) {
-            recentInsights.push({
-              title: f.title,
-              insight: f.insight,
-              category: f.category,
-              confidence: f.confidence ?? 0.5,
-            });
-          }
-        }
+      const supabase = createAdmin();
+      // 최근 24시간 내 생성된 인사이트 (오늘 것)
+      const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: findings } = await supabase
+        .from("research_findings")
+        .select("title, insight, category, confidence, symbols")
+        .gte("created_at", cutoff)
+        .order("confidence", { ascending: false })
+        .limit(3);
+      
+      for (const f of findings ?? []) {
+        recentInsights.push({
+          title: f.title,
+          insight: f.insight,
+          category: f.category,
+          confidence: f.confidence ?? 0.5,
+          symbols: f.symbols ?? [],
+        });
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[morning-brief] insight 조회 실패:", e);
+    }
     
     return NextResponse.json({
       success: true,

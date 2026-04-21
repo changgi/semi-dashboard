@@ -90,6 +90,8 @@ function interpretFx(current: number, change1d: number, change1w: number): {
 
 // ───────────────────────────────────────────────────────────
 // 한국 ETF 분석
+// 카일님이 주로 관심있는 한국 ETF (카테고리별 대표)
+// 참고: Symbol Universe DB 확장 시 이 목록도 동적으로 가능
 // ───────────────────────────────────────────────────────────
 const KOREAN_ETFS = [
   { symbol: "360750.KS", name: "TIGER S&P500", sector: "us_large" },

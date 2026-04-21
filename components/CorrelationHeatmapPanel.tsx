@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -148,9 +149,9 @@ export function CorrelationHeatmapPanel() {
                     <span className="text-[18px]">{corrEmoji(c.correlation)}</span>
                     <div>
                       <div className="flex items-center gap-1 flex-wrap">
-                        <span className="tick font-bold text-[12px]">{pair[0]}</span>
+                        <SymbolDisplay meta={{ symbol: pair[0] }} size="sm" variant="inline" showFlag={true} showBadges={false} showName={false} />
                         <span className="dim text-[11px]">↔</span>
-                        <span className="tick font-bold text-[12px]">{pair[1]}</span>
+                        <SymbolDisplay meta={{ symbol: pair[1] }} size="sm" variant="inline" showFlag={true} showBadges={false} showName={false} />
                       </div>
                       <div className="text-[9px] dim kr mt-0.5">
                         {c.sampleSize}개 데이터 · {c.lookbackDays}일 기준

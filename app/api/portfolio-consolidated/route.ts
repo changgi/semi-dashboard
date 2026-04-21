@@ -17,6 +17,13 @@ export const maxDuration = 30;
 interface ConsolidatedPosition {
   symbol: string;
   name: string | null;
+  symbolMeta?: {
+    symbol: string;
+    displayName: string;
+    country?: string;
+    isSemi?: boolean;
+    indexes?: string[];
+  };
   totalShares: number;
   weightedAvgCost: number;  // 가중평균 단가
   totalCost: number;
@@ -68,11 +75,18 @@ export async function GET() {
 
     // 실시간 시세 + 환율
     const symbols = [...new Set(holdings.map((h) => h.symbol))];
-    const [quotes, fxQuotes] = await Promise.all([
+    const [quotes, fxQuotes, universeData] = await Promise.all([
       fetchYahooQuotes(symbols),
       fetchYahooQuotes(["KRW=X"]),
+      supabase.from("symbol_universe").select("symbol, name_ko, country, is_semi, in_sp500, in_nasdaq100, in_kospi100").in("symbol", symbols),
     ]);
     const usdKrw = fxQuotes.get("KRW=X")?.price ?? 1350;
+    
+    // Symbol Universe 메타 매핑 (한글명 + 인덱스 정보)
+    const universeMap = new Map<string, any>();
+    for (const u of (universeData.data ?? [])) {
+      universeMap.set(u.symbol, u);
+    }
 
     // ─────────────────────────────────────────────
     // 같은 심볼끼리 그룹핑
@@ -95,8 +109,12 @@ export async function GET() {
       const q = quotes.get(symbol);
       const currentPrice = q?.price ?? null;
       const currency = positions[0].currency || "USD";
-      // 첫 번째 포지션에서 이름 가져오기 (빈 거 제외)
-      const name = positions.find((p) => p.name && p.name !== symbol)?.name ?? positions[0].name;
+      // 이름 우선순위: Symbol Universe 한글명 → 저장된 이름 → 심볼
+      const universeMeta = universeMap.get(symbol);
+      const name = universeMeta?.name_ko 
+        || positions.find((p) => p.name && p.name !== symbol)?.name 
+        || positions[0].name
+        || symbol;
 
       // 총 수량 + 총 매입액
       let totalShares = 0;
@@ -140,6 +158,18 @@ export async function GET() {
       consolidated.push({
         symbol,
         name,
+        // Symbol Universe 메타 (프론트에서 SymbolDisplay 사용)
+        symbolMeta: universeMeta ? {
+          symbol,
+          displayName: universeMeta.name_ko || name,
+          country: universeMeta.country,
+          isSemi: universeMeta.is_semi,
+          indexes: [
+            universeMeta.in_sp500 && "S&P500",
+            universeMeta.in_nasdaq100 && "NASDAQ100",
+            universeMeta.in_kospi100 && "KOSPI100",
+          ].filter(Boolean),
+        } : { symbol, displayName: name },
         totalShares: Math.round(totalShares * 10000) / 10000,
         weightedAvgCost: Math.round(weightedAvgCost * 100) / 100,
         totalCost: Math.round(totalCost * 100) / 100,
@@ -186,6 +216,19 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      positions: [],
+      summary: {
+        totalValueUsd: 0,
+        totalCostUsd: 0,
+        totalGainUsd: 0,
+        totalGainPct: 0,
+        positionCount: 0,
+        rawHoldingCount: 0,
+      },
+    });
   }
 }

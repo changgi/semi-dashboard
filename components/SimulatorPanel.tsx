@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 // ───────────────────────────────────────────────────────────
 // 타입
@@ -365,7 +366,16 @@ function ResultsTable({ results, mode }: { results: SimResult[]; mode: string })
           <tbody>
             {results.sort((a, b) => b.totalReturnPct - a.totalReturnPct).map((r) => (
               <tr key={r.symbol} className="border-b border-[var(--border)]">
-                <td className="py-1.5 px-2 tick font-bold">{r.symbol}</td>
+                <td className="py-1.5 px-2">
+                  <SymbolDisplay
+                    meta={{ symbol: r.symbol }}
+                    size="sm"
+                    variant="inline"
+                    showFlag={true}
+                    showBadges={false}
+                    showName={false}
+                  />
+                </td>
                 <td className="text-right py-1.5 px-2 tick">${r.totalInvested.toLocaleString()}</td>
                 <td className="text-right py-1.5 px-2 tick font-bold">${r.finalValue.toLocaleString()}</td>
                 <td className={`text-right py-1.5 px-2 font-bold ${r.totalReturn >= 0 ? "up" : "down"}`}>

@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -186,8 +187,13 @@ export function RebalanceHelperPanel() {
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="tick font-bold text-[11px]">{a.symbol}</span>
-                          <span className="text-[10px] kr">{a.name}</span>
+                          <SymbolDisplay
+                            meta={{ symbol: a.symbol, displayName: a.name }}
+                            size="sm"
+                            variant="inline"
+                            showFlag={true}
+                            showBadges={false}
+                          />
                           <span className="text-[8px] px-1.5 py-0.5 bg-[var(--amber-dim)] text-white rounded">
                             목표 {a.targetPct}%
                           </span>

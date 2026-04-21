@@ -39,6 +39,10 @@ export async function GET(req: NextRequest) {
       predictionsData,
       forecastsData,
       accuracyData,
+      universeData,
+      correlationsData,
+      insightsData,
+      earningsData,
     ] = await Promise.all([
       // 1. 실시간 시세
       fetchYahooQuotes([upperSym]),
@@ -106,6 +110,33 @@ export async function GET(req: NextRequest) {
         .eq("symbol", upperSym)
         .order("target_date", { ascending: true })
         .limit(100),
+      // 12. Symbol Universe 메타 (한글명 + 인덱스 + 반도체)
+      supabase
+        .from("symbol_universe")
+        .select("*")
+        .eq("symbol", upperSym)
+        .maybeSingle(),
+      // 13. 상관관계 (이 종목이 포함된 쌍)
+      supabase
+        .from("correlation_matrix")
+        .select("*")
+        .or(`symbol_a.eq.${upperSym},symbol_b.eq.${upperSym}`)
+        .order("computed_at", { ascending: false })
+        .limit(10),
+      // 14. 이 종목 관련 인사이트 (research_findings)
+      supabase
+        .from("research_findings")
+        .select("*")
+        .contains("symbols", [upperSym])
+        .order("created_at", { ascending: false })
+        .limit(5),
+      // 15. 실적 스케줄
+      supabase
+        .from("earnings_schedule")
+        .select("*")
+        .eq("symbol", upperSym)
+        .eq("is_active", true)
+        .order("earnings_date", { ascending: true }),
     ]);
 
     const quote = quotesData.get(upperSym);
@@ -319,9 +350,50 @@ export async function GET(req: NextRequest) {
         marketState: quote.marketState,
       },
       info: {
-        name: tickerData.data?.name ?? null,
+        // 이름 우선: Symbol Universe 한글 → tickers 이름 → 심볼
+        name: universeData.data?.name_ko || universeData.data?.name_en || tickerData.data?.name || upperSym,
+        nameKo: universeData.data?.name_ko ?? null,
+        nameEn: universeData.data?.name_en ?? null,
         segment: tickerData.data?.segment ?? null,
-        country: tickerData.data?.country ?? null,
+        country: universeData.data?.country ?? tickerData.data?.country ?? null,
+        currency: universeData.data?.currency ?? null,
+        exchange: universeData.data?.exchange ?? null,
+        // 인덱스 멤버십
+        inSp500: universeData.data?.in_sp500 ?? false,
+        inNasdaq100: universeData.data?.in_nasdaq100 ?? false,
+        inKospi100: universeData.data?.in_kospi100 ?? false,
+        isSemi: universeData.data?.is_semi ?? false,
+        semiCategory: universeData.data?.semi_category ?? null,
+        gicsSector: universeData.data?.gics_sector ?? null,
+        gicsIndustry: universeData.data?.gics_industry ?? null,
+        isEtf: universeData.data?.is_etf ?? false,
+        marketCapTier: universeData.data?.market_cap_tier ?? null,
+      },
+      // Warehouse 데이터
+      warehouse: {
+        correlations: (correlationsData.data ?? []).map((c: any) => ({
+          otherSymbol: c.symbol_a === upperSym ? c.symbol_b : c.symbol_a,
+          correlation: c.correlation,
+          lookbackDays: c.lookback_days,
+          computedDate: c.computed_date,
+          sampleSize: c.sample_size,
+        })),
+        insights: (insightsData.data ?? []).map((i: any) => ({
+          date: i.observation_date,
+          category: i.category,
+          title: i.title,
+          insight: i.insight,
+          confidence: i.confidence,
+          tags: i.tags ?? [],
+        })),
+        upcomingEarnings: (earningsData.data ?? []).map((e: any) => ({
+          date: e.earnings_date,
+          quarter: e.quarter,
+          importance: e.importance,
+          time: e.earnings_time,
+          notes: e.notes,
+          affectedEtfs: e.affected_etfs ?? [],
+        })),
       },
       returns,
       technicals: {
@@ -351,6 +423,16 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      symbol: null,
+      quote: null,
+      info: null,
+      returns: {},
+      technicals: {},
+      warehouse: { correlations: [], insights: [], upcomingEarnings: [] },
+    });
   }
 }

@@ -26,6 +26,9 @@ export interface SymbolMeta {
   isEtf?: boolean;
   indexes?: string[];
   sector?: string;
+  // ETF 세부 분류
+  tags?: string[];          // ["레버리지", "인버스", "2x", "3x" 등]
+  relatedEtfs?: string[];   // ["NVDA", "SPY" 등 기초자산]
 }
 
 interface Props {
@@ -70,7 +73,36 @@ export function SymbolDisplay({
   if (m.indexes?.includes("NASDAQ100")) badges.push({ label: "NDX100", color: "#aaccff" });
   if (m.indexes?.includes("KOSPI100")) badges.push({ label: "KOSPI", color: "#ffaa44" });
   if (m.isSemi) badges.push({ label: "반도체", color: "#ee99ff", emoji: "🎮" });
-  if (m.isEtf) badges.push({ label: "ETF", color: "#aaccff", emoji: "📊" });
+  
+  // ETF 세부 분류 (레버리지/인버스 우선)
+  const tags = m.tags ?? [];
+  const isLeverage = tags.includes("레버리지");
+  const isInverse = tags.includes("인버스");
+  const multiplier = tags.find(t => /^\d+(\.\d+)?x$/i.test(t));
+  
+  if (isInverse) {
+    badges.push({ 
+      label: multiplier ? `인버스 ${multiplier}` : "인버스", 
+      color: "#ff3860", 
+      emoji: "📉" 
+    });
+  } else if (isLeverage) {
+    badges.push({ 
+      label: multiplier ? `${multiplier}` : "레버리지", 
+      color: "#ffaa44", 
+      emoji: "⚡" 
+    });
+  } else if (m.isEtf) {
+    badges.push({ label: "ETF", color: "#aaccff", emoji: "📊" });
+  }
+  
+  // 기초자산 표시 (레버리지 ETF의 경우)
+  if ((isLeverage || isInverse) && m.relatedEtfs && m.relatedEtfs.length > 0) {
+    badges.push({
+      label: `→${m.relatedEtfs[0]}`,
+      color: "#888",
+    });
+  }
 
   if (variant === "badge") {
     return (

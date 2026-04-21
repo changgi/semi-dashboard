@@ -36,7 +36,7 @@ export function PortfolioCRUDPanel() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [indexFilter, setIndexFilter] = useState<"all" | "sp500" | "nasdaq100" | "kospi100" | "semi">("all");
+  const [indexFilter, setIndexFilter] = useState<"all" | "sp500" | "nasdaq100" | "kospi100" | "semi" | "etf" | "leverage" | "inverse">("all");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const { data, isLoading } = useSWR<HoldingsResponse>(
@@ -78,11 +78,16 @@ export function PortfolioCRUDPanel() {
     setShowSuggestions(false);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleAdd = async () => {
     if (!form.symbol || !form.shares || !form.avg_cost) {
-      showMessage("error", "모든 필드 입력 필요");
+      showMessage("error", "모든 필드 입력 필요 (종목/수량/평단)");
       return;
     }
+    if (isSubmitting) return; // 중복 방지
+    
+    setIsSubmitting(true);
     try {
       const res = await fetch("/api/portfolio-manage", {
         method: "POST",
@@ -97,16 +102,31 @@ export function PortfolioCRUDPanel() {
       });
       const json = await res.json();
       if (json.success) {
-        showMessage("success", `${form.symbol} ${form.shares}주 추가 완료!`);
-        resetForm();
-        setMode("list");
+        // 성공 메시지 먼저 표시 (5초 유지)
+        setMessage({ 
+          type: "success", 
+          text: `✅ ${form.symbol} ${form.shares}주 추가 완료! (ID: ${json.holding?.id ?? "-"})` 
+        });
+        setTimeout(() => setMessage(null), 5000);
+        
+        // 1초 후 목록으로 이동 (사용자가 피드백 볼 시간)
+        setTimeout(() => {
+          resetForm();
+          setMode("list");
+        }, 800);
+        
+        // 데이터 갱신
         mutate("/api/portfolio-manage");
-        mutate("/api/portfolio"); // 다른 패널들도 갱신
+        mutate("/api/portfolio");
+        mutate("/api/portfolio-consolidated");
+        mutate("/api/morning-brief");
       } else {
-        showMessage("error", json.error || "추가 실패");
+        showMessage("error", `❌ ${json.error || "추가 실패"}`);
       }
     } catch (e) {
-      showMessage("error", (e as Error).message);
+      showMessage("error", `❌ 네트워크 오류: ${(e as Error).message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -270,161 +290,262 @@ export function PortfolioCRUDPanel() {
         </>
       )}
 
-      {/* 추가/수정 모드 */}
+      {/* 추가/수정 모드 - 개선된 UX */}
       {(mode === "add" || mode === "edit") && (
         <div className="space-y-3">
-          <div className="text-[11px] tick font-bold kr">
-            {mode === "add" ? "＋ 새 종목 추가" : "✏️ 종목 수정"}
-          </div>
 
-          {/* 심볼 자동완성 */}
-          {mode === "add" && (
-            <div className="relative">
-              <label className="text-[9px] dim kr block mb-1">종목 검색 (심볼 or 회사명)</label>
+          {/* ═══ STEP 1: 종목 선택 ═══ */}
+          {mode === "add" && !form.symbol && (
+            <div>
+              <div className="text-[11px] tick font-bold kr mb-2">
+                📍 STEP 1 · 종목 선택
+              </div>
               
-              {/* 인덱스 필터 */}
-              <div className="mb-2 flex gap-1 flex-wrap">
+              {/* 큰 검색창 (모바일 최적화) */}
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">🔍</div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  autoFocus
+                  placeholder="NVDA, 엔비디아, 삼성전자, TIGER..."
+                  className="w-full text-[14px] pl-10 pr-3 py-3 bg-black/40 border-2 border-[var(--amber)] rounded-lg kr focus:outline-none"
+                />
+              </div>
+              
+              {/* 필터 버튼 (검색창 아래) */}
+              <div className="mt-2 flex gap-1 flex-wrap">
                 {[
                   { val: "all",        label: "🌐 전체" },
                   { val: "sp500",      label: "🇺🇸 S&P500" },
                   { val: "nasdaq100",  label: "🚀 NDX100" },
                   { val: "kospi100",   label: "🇰🇷 KOSPI100" },
                   { val: "semi",       label: "🎮 반도체" },
+                  { val: "etf",        label: "📊 ETF" },
+                  { val: "leverage",   label: "⚡ 레버리지" },
+                  { val: "inverse",    label: "📉 인버스" },
                 ].map(f => (
                   <button
                     key={f.val}
                     onClick={() => setIndexFilter(f.val as any)}
-                    className={`text-[9px] px-2 py-1 border rounded kr ${
+                    className={`text-[10px] px-2.5 py-1.5 border rounded kr ${
                       indexFilter === f.val
-                        ? "border-[var(--amber)] bg-[rgba(255,176,0,0.1)] text-[var(--amber)] font-bold"
-                        : "border-[var(--border)] dim hover:bg-[rgba(255,255,255,0.03)]"
+                        ? "border-[var(--amber)] bg-[rgba(255,176,0,0.15)] text-[var(--amber)] font-bold"
+                        : "border-[var(--border)] dim"
                     }`}
                   >
                     {f.label}
                   </button>
                 ))}
               </div>
-              
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowSuggestions(true);
-                  setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }));
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                placeholder="예: NVDA, 엔비디아, TIGER, 삼성전자..."
-                className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded kr"
-              />
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-64 overflow-y-auto z-10 shadow-lg">
+
+              {/* 검색 결과 */}
+              {searchQuery.length >= 1 && suggestions.length > 0 && (
+                <div className="mt-2 bg-[#1a1a1a] border border-[var(--border)] rounded max-h-80 overflow-y-auto">
                   {suggestions.map(s => (
                     <button
                       key={s.symbol}
                       onClick={() => selectSuggestion(s)}
-                      className="w-full text-left px-2 py-2 hover:bg-[rgba(255,176,0,0.1)] border-b border-[var(--border)]/30"
+                      className="w-full text-left px-3 py-2.5 hover:bg-[rgba(255,176,0,0.1)] active:bg-[rgba(255,176,0,0.2)] border-b border-[var(--border)]/30 last:border-b-0"
                     >
-                      <SymbolDisplay meta={s} size="sm" variant="block" showBadges={true} />
+                      <SymbolDisplay meta={s} size="md" variant="block" showBadges={true} />
                     </button>
                   ))}
                 </div>
               )}
-              <div className="text-[8px] dim kr mt-1">
-                💡 S&P500 + NASDAQ100 + KOSPI100 + 반도체 전종목 검색 가능
-              </div>
+
+              {/* 빠른 선택 - 필터 없을 때만 */}
+              {searchQuery.length === 0 && indexFilter === "all" && (
+                <div className="mt-3">
+                  <div className="text-[9px] dim kr mb-2">💡 빠른 선택 (자주 쓰는 종목)</div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { symbol: "NVDA",       label: "엔비디아",  flag: "🇺🇸" },
+                      { symbol: "TSM",        label: "TSMC",      flag: "🇹🇼" },
+                      { symbol: "AAPL",       label: "애플",      flag: "🇺🇸" },
+                      { symbol: "005930.KS",  label: "삼성전자",  flag: "🇰🇷" },
+                      { symbol: "000660.KS",  label: "SK하이닉스", flag: "🇰🇷" },
+                      { symbol: "360750.KS",  label: "TIGER S&P",  flag: "🇰🇷" },
+                    ].map(q => (
+                      <button
+                        key={q.symbol}
+                        onClick={() => {
+                          setSearchQuery(q.symbol);
+                          setShowSuggestions(true);
+                        }}
+                        className="text-[10px] px-2 py-2 border border-[var(--border)] rounded kr hover:bg-[rgba(255,176,0,0.08)]"
+                      >
+                        {q.flag} {q.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* 심볼 (수정 모드: 읽기 전용) */}
-          {mode === "edit" && (
-            <div>
-              <label className="text-[9px] dim kr block mb-1">종목</label>
-              <div className="text-[12px] tick font-bold p-2 bg-black/20 rounded">
-                {form.symbol} ({form.name})
-              </div>
-            </div>
-          )}
-
-          {/* 회사명 */}
-          <div>
-            <label className="text-[9px] dim kr block mb-1">회사명 (표시용)</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-              placeholder="자동 입력 (수정 가능)"
-              className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded kr"
-            />
-          </div>
-
-          {/* 수량 + 평단 */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[9px] dim kr block mb-1">수량 (주)</label>
-              <input
-                type="number"
-                value={form.shares}
-                onChange={(e) => setForm(f => ({ ...f, shares: e.target.value }))}
-                placeholder="예: 10"
-                min="0"
-                step="any"
-                className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded"
-              />
-            </div>
-            <div>
-              <label className="text-[9px] dim kr block mb-1">
-                평균 매수가 ({form.currency})
-              </label>
-              <input
-                type="number"
-                value={form.avg_cost}
-                onChange={(e) => setForm(f => ({ ...f, avg_cost: e.target.value }))}
-                placeholder={form.currency === "KRW" ? "예: 24460" : "예: 180.50"}
-                min="0"
-                step="any"
-                className="w-full text-[11px] px-2 py-2 bg-black/40 border border-[var(--border)] rounded"
-              />
-            </div>
-          </div>
-
-          {/* 통화 (추가 모드만) */}
-          {mode === "add" && (
-            <div>
-              <label className="text-[9px] dim kr block mb-1">통화</label>
-              <div className="flex gap-2">
-                {(["KRW", "USD"] as const).map(c => (
+          {/* ═══ STEP 2: 수량/평단 (종목 선택 후 노출) ═══ */}
+          {mode === "add" && form.symbol && (
+            <>
+              {/* 선택된 종목 카드 */}
+              <div className="border-2 border-[var(--amber)] bg-[rgba(255,176,0,0.05)] rounded-lg p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[9px] dim kr mb-1">✓ 선택됨</div>
+                    <div className="text-[14px] tick font-bold">
+                      {form.symbol}
+                    </div>
+                    <div className="text-[11px] kr mt-0.5">
+                      {form.name} · <span className="dim">{form.currency === "KRW" ? "🇰🇷 원화" : "🇺🇸 달러"}</span>
+                    </div>
+                  </div>
                   <button
-                    key={c}
-                    onClick={() => setForm(f => ({ ...f, currency: c }))}
-                    className={`flex-1 text-[11px] px-3 py-2 border rounded kr ${
-                      form.currency === c
-                        ? "border-[var(--amber)] bg-[var(--amber)] text-[#111] font-bold"
-                        : "border-[var(--border)] dim"
-                    }`}
+                    onClick={() => {
+                      setForm(f => ({ ...f, symbol: "", name: "" }));
+                      setSearchQuery("");
+                    }}
+                    className="text-[10px] px-2 py-1 border border-[var(--border)] rounded kr dim hover:bg-[rgba(255,255,255,0.05)] flex-shrink-0"
                   >
-                    {c === "KRW" ? "🇰🇷 원화" : "🇺🇸 달러"}
+                    🔄 변경
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+
+              <div className="text-[11px] tick font-bold kr">
+                📍 STEP 2 · 수량 & 평단
+              </div>
+
+              {/* 수량 + 평단 (큰 입력) */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] dim kr block mb-1">📦 수량 *</label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={form.shares}
+                    onChange={(e) => setForm(f => ({ ...f, shares: e.target.value }))}
+                    placeholder="10"
+                    min="0"
+                    step="any"
+                    autoFocus
+                    className="w-full text-[16px] px-3 py-2.5 bg-black/40 border-2 border-[var(--border)] focus:border-[var(--amber)] rounded-lg outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] dim kr block mb-1">
+                    💰 평단 ({form.currency === "KRW" ? "₩" : "$"}) *
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={form.avg_cost}
+                    onChange={(e) => setForm(f => ({ ...f, avg_cost: e.target.value }))}
+                    placeholder={form.currency === "KRW" ? "24460" : "180.50"}
+                    min="0"
+                    step="any"
+                    className="w-full text-[16px] px-3 py-2.5 bg-black/40 border-2 border-[var(--border)] focus:border-[var(--amber)] rounded-lg outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* 통화 변경 (접기, 기본은 자동 결정됨) */}
+              <details className="text-[10px] kr">
+                <summary className="dim cursor-pointer select-none py-1">
+                  ⚙️ 통화 변경 (기본: 자동 선택됨)
+                </summary>
+                <div className="mt-2 flex gap-2">
+                  {(["KRW", "USD"] as const).map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setForm(f => ({ ...f, currency: c }))}
+                      className={`flex-1 text-[11px] px-3 py-2 border rounded kr ${
+                        form.currency === c
+                          ? "border-[var(--amber)] bg-[var(--amber)] text-[#111] font-bold"
+                          : "border-[var(--border)] dim"
+                      }`}
+                    >
+                      {c === "KRW" ? "🇰🇷 원화" : "🇺🇸 달러"}
+                    </button>
+                  ))}
+                </div>
+              </details>
+
+              {/* 큰 추가 버튼 (모바일 최적화) */}
+              <button
+                onClick={handleAdd}
+                disabled={!form.shares || !form.avg_cost || isSubmitting}
+                className="w-full text-[14px] px-4 py-3 border-2 border-[var(--amber)] bg-[var(--amber)] text-[#111] rounded-lg kr font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {isSubmitting ? "⏳ 추가 중..." : "＋ 포트폴리오에 추가"}
+              </button>
+
+              {/* 취소 */}
+              <button
+                onClick={() => { setMode("list"); resetForm(); }}
+                className="w-full text-[11px] px-3 py-2 border border-[var(--border)] rounded kr dim"
+              >
+                취소
+              </button>
+            </>
           )}
 
-          {/* 제출 버튼 */}
-          <div className="flex gap-2 pt-2">
-            <button
-              onClick={mode === "add" ? handleAdd : handleEdit}
-              className="flex-1 text-[11px] px-3 py-2 border border-[var(--amber)] bg-[var(--amber)] text-[#111] rounded kr font-bold"
-            >
-              {mode === "add" ? "＋ 추가하기" : "✓ 저장"}
-            </button>
-            <button
-              onClick={() => { setMode("list"); resetForm(); }}
-              className="text-[11px] px-3 py-2 border border-[var(--border)] rounded kr dim"
-            >
-              취소
-            </button>
-          </div>
+          {/* ═══ 수정 모드 (기존 유지) ═══ */}
+          {mode === "edit" && (
+            <>
+              <div className="text-[11px] tick font-bold kr">✏️ 종목 수정</div>
+              <div className="border border-[var(--border)] rounded p-2 bg-black/20">
+                <div className="text-[12px] tick font-bold">{form.symbol}</div>
+                <div className="text-[10px] kr dim">{form.name}</div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] dim kr block mb-1">📦 수량 *</label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={form.shares}
+                    onChange={(e) => setForm(f => ({ ...f, shares: e.target.value }))}
+                    min="0"
+                    step="any"
+                    className="w-full text-[14px] px-3 py-2.5 bg-black/40 border-2 border-[var(--border)] rounded-lg outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] dim kr block mb-1">
+                    💰 평단 ({form.currency === "KRW" ? "₩" : "$"}) *
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={form.avg_cost}
+                    onChange={(e) => setForm(f => ({ ...f, avg_cost: e.target.value }))}
+                    min="0"
+                    step="any"
+                    className="w-full text-[14px] px-3 py-2.5 bg-black/40 border-2 border-[var(--border)] rounded-lg outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleEdit}
+                className="w-full text-[14px] px-4 py-3 border-2 border-[var(--amber)] bg-[var(--amber)] text-[#111] rounded-lg kr font-bold"
+              >
+                ✓ 저장
+              </button>
+              <button
+                onClick={() => { setMode("list"); resetForm(); }}
+                className="w-full text-[11px] px-3 py-2 border border-[var(--border)] rounded kr dim"
+              >
+                취소
+              </button>
+            </>
+          )}
         </div>
       )}
 

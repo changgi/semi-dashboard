@@ -3,6 +3,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { fmtPrice, fmtPct } from "@/lib/format";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -136,7 +137,13 @@ export function TradingSignalBoard() {
                       >
                         {cfg.icon}
                       </span>
-                      <span className="tick text-[13px] sm:text-[16px] font-bold">{s.symbol}</span>
+                      <SymbolDisplay
+                        meta={{ symbol: s.symbol }}
+                        size="md"
+                        variant="inline"
+                        showFlag={true}
+                        showBadges={false}
+                      />
                       <span className="text-[9px] sm:text-[10px] dim kr hidden sm:inline">
                         {cfg.label}
                       </span>

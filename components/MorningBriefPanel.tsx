@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -136,8 +137,16 @@ export function MorningBriefPanel() {
                 const impactEmoji = e.impact === "direct" ? "🎯" : e.impact === "indirect" ? "🔗" : "👁️";
                 return (
                   <div key={i} className="flex items-center justify-between text-[10px] kr">
-                    <span>
-                      <span className="tick font-bold">{e.symbol}</span> D-{e.daysUntil}
+                    <span className="flex items-center gap-1.5">
+                      <SymbolDisplay
+                        meta={{ symbol: e.symbol }}
+                        size="sm"
+                        variant="inline"
+                        showFlag={true}
+                        showBadges={false}
+                        showName={false}
+                      />
+                      <span className="dim">D-{e.daysUntil}</span>
                     </span>
                     <span className="dim">{impactEmoji}</span>
                   </div>

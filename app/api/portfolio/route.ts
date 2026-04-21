@@ -229,7 +229,25 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    // Soft failure: 프론트 SWR이 재시도하지 않도록 200 반환
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      holdings: [],
+      summary: {
+        totalValue: 0,
+        totalCost: 0,
+        totalGain: 0,
+        totalGainPct: 0,
+        dayChange: 0,
+        dayChangePct: 0,
+        positionCount: 0,
+        topWinner: null,
+        topLoser: null,
+      },
+      sectorBreakdown: [],
+    });
   }
 }
 

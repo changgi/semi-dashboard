@@ -88,6 +88,13 @@ export async function GET() {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      items: [],
+      krwAnalysis: null,
+      timestamp: new Date().toISOString(),
+    });
   }
 }

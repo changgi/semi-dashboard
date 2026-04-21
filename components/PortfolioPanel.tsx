@@ -3,6 +3,7 @@
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { SkeletonBar, SkeletonCards, SkeletonTable } from "./Skeleton";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -396,19 +397,16 @@ export function PortfolioPanel() {
               </thead>
               <tbody>
                 {(data.holdings ?? []).map((h) => {
-                  // 이름이 의미 있는지 체크 (심볼과 같으면 무시)
-                  const hasGoodName = h.name && h.name !== h.symbol && !/^\d+$/.test(h.name);
                   return (
                   <tr key={h.id} className="border-b border-[var(--border)] data-row">
-                    <td className="py-1.5 px-2 tick font-bold">{h.symbol}</td>
-                    <td className="py-1.5 px-2 kr truncate max-w-[120px]">
-                      {hasGoodName ? (
-                        <span className="dim">{h.name}</span>
-                      ) : (
-                        <span className="text-[#ff8888] text-[8px]" title="종목명이 없습니다. 마이그레이션 실행 또는 수정 후 Yahoo에서 자동 조회됩니다">
-                          ⚠ 이름 없음
-                        </span>
-                      )}
+                    <td className="py-1.5 px-2" colSpan={2}>
+                      <SymbolDisplay
+                        meta={{ symbol: h.symbol, displayName: h.name ?? undefined }}
+                        size="sm"
+                        variant="inline"
+                        showFlag={true}
+                        showBadges={false}
+                      />
                     </td>
                     <td className="text-right py-1.5 px-2 dim">{h.shares}</td>
                     <td className="text-right py-1.5 px-2">
@@ -522,13 +520,14 @@ export function PortfolioPanel() {
                           <td className="py-1.5 px-2 text-[var(--amber)] text-[10px]">
                             {hasMultiple ? (isExpanded ? "▼" : "▶") : ""}
                           </td>
-                          <td className="py-1.5 px-2 tick font-bold">{p.symbol}</td>
-                          <td className="py-1.5 px-2 kr truncate max-w-[140px]">
-                            {hasGoodName ? (
-                              <span className="dim">{p.name}</span>
-                            ) : (
-                              <span className="text-[#ff8888] text-[8px]">⚠ 이름 없음</span>
-                            )}
+                          <td className="py-1.5 px-2" colSpan={2}>
+                            <SymbolDisplay
+                              meta={(p as any).symbolMeta || { symbol: p.symbol, displayName: p.name ?? undefined }}
+                              size="sm"
+                              variant="inline"
+                              showFlag={true}
+                              showBadges={false}
+                            />
                           </td>
                           <td className="text-right py-1.5 px-2 tick">
                             {p.totalShares}

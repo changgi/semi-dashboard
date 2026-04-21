@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     
     let sb = supabase
       .from("symbol_universe")
-      .select("symbol, name_ko, name_en, exchange, country, currency, in_sp500, in_nasdaq100, in_kospi100, is_semi, semi_category, gics_sector, gics_industry, market_cap_tier, is_etf, related_etfs")
+      .select("symbol, name_ko, name_en, exchange, country, currency, in_sp500, in_nasdaq100, in_kospi100, is_semi, semi_category, semi_tags, gics_sector, gics_industry, market_cap_tier, is_etf, related_etfs, notes")
       .eq("is_active", true);
     
     // 인덱스 필터
@@ -38,6 +38,8 @@ export async function GET(req: NextRequest) {
     else if (index === "kospi100") sb = sb.eq("in_kospi100", true);
     else if (index === "semi") sb = sb.eq("is_semi", true);
     else if (index === "etf") sb = sb.eq("is_etf", true);
+    else if (index === "leverage") sb = sb.contains("semi_tags", ["레버리지"]);
+    else if (index === "inverse") sb = sb.contains("semi_tags", ["인버스"]);
     
     // 국가 필터
     if (country) sb = sb.eq("country", country);
@@ -86,6 +88,8 @@ export async function GET(req: NextRequest) {
       marketCapTier: s.market_cap_tier,
       isEtf: s.is_etf,
       relatedEtfs: s.related_etfs ?? [],
+      tags: s.semi_tags ?? [],
+      notes: s.notes ?? null,
       // 표시 헬퍼
       displayLabel: formatDisplayLabel(s),
     }));

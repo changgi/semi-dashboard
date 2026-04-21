@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { useState } from "react";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 import { safeFetcher } from "@/lib/swr-config";
 const fetcher = safeFetcher;
@@ -351,9 +352,16 @@ function OverviewBox({
                   href={`/stock/${r.symbol}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="tick font-bold text-[12px] hover:bright"
+                  className="hover:opacity-80"
                 >
-                  {r.symbol}
+                  <SymbolDisplay
+                    meta={{ symbol: r.symbol }}
+                    size="sm"
+                    variant="inline"
+                    showFlag={true}
+                    showBadges={false}
+                    showName={false}
+                  />
                 </a>
                 <div className="text-right">
                   <span className="text-[10px] tick">${r.currentPrice.toFixed(2)}</span>
@@ -417,9 +425,16 @@ function BuySellList({
                     href={`/stock/${r.symbol}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[14px] tick font-bold hover:bright"
+                    className="hover:opacity-80"
                   >
-                    {r.symbol}
+                    <SymbolDisplay
+                      meta={{ symbol: r.symbol }}
+                      size="md"
+                      variant="inline"
+                      showFlag={true}
+                      showBadges={false}
+                      showName={false}
+                    />
                   </a>
                   <span className="text-[11px] tick">${r.currentPrice.toFixed(2)}</span>
                   <span

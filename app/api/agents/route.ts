@@ -224,6 +224,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ...response, _cache: "miss" });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: msg,
+      _soft_failure: true,
+      agents: [],
+      consensusBySymbol: {},
+    });
   }
 }

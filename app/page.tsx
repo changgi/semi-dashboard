@@ -57,6 +57,7 @@ import { EconomicCalendarPanel } from "@/components/EconomicCalendarPanel";
 import { SimulatorPanel } from "@/components/SimulatorPanel";
 import { ToolboxPanel } from "@/components/ToolboxPanel";
 import { UrgentEventBanner } from "@/components/UrgentEventBanner";
+import { QuickStatusBar } from "@/components/QuickStatusBar";
 import { EarningsMonitorPanel } from "@/components/EarningsMonitorPanel";
 import { PositionGuidePanel } from "@/components/PositionGuidePanel";
 import { PushNotifications } from "@/components/PushNotifications";
@@ -183,6 +184,13 @@ export default function Dashboard() {
 
       {/* ═══════════════ MAIN GRID ═══════════════ */}
       <div className="px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-12 gap-3 sm:gap-5">
+
+        {/* ⚡ QUICK STATUS BAR - 3초 파악 */}
+        <div className="col-span-12">
+          <PanelErrorBoundary panelName="Quick Status" compact>
+            <QuickStatusBar />
+          </PanelErrorBoundary>
+        </div>
 
         {/* 🚨 URGENT EVENT BANNER - D-3 이내 중요 이벤트 경고 */}
         <div className="col-span-12">

@@ -17,15 +17,34 @@ export const maxDuration = 90;
 // ═══════════════════════════════════════════════════════════
 
 import { getScannerSymbols } from "@/lib/semi-universe";
+import { createAdmin } from "@/lib/supabase";
 
-// 반도체 유니버스에서 30+ 종목 스캔 (한국/미국/대만/네덜란드/일본)
-const SECTOR_SYMBOLS = [
-  ...getScannerSymbols(),
-  // 관련 빅테크 (반도체 영향권)
-  "MSFT", "GOOGL", "META", "AAPL", "AMZN", "TSLA",
-  // 섹터 비교용
-  "SPY", "QQQ",
-];
+// ═══════════════════════════════════════════════════════════
+// DB 기반 동적 종목 로드 (Symbol Universe + 반도체 + 빅테크 + ETF)
+// ═══════════════════════════════════════════════════════════
+async function loadScannerSymbols(): Promise<string[]> {
+  try {
+    const supabase = createAdmin();
+    // 반도체 + 빅테크 + 주요 ETF
+    const { data } = await supabase
+      .from("symbol_universe")
+      .select("symbol")
+      .eq("is_active", true)
+      .or("is_semi.eq.true,symbol.in.(MSFT,GOOGL,META,AAPL,AMZN,TSLA,SPY,QQQ,SMH,SOXX)");
+    
+    if (data && data.length > 0) {
+      return data.map((r: any) => r.symbol);
+    }
+  } catch (e) {
+    console.warn("[sector-scanner] DB load failed, using fallback");
+  }
+  // Fallback: 기존 하드코딩
+  return [
+    ...getScannerSymbols(),
+    "MSFT", "GOOGL", "META", "AAPL", "AMZN", "TSLA",
+    "SPY", "QQQ",
+  ];
+}
 
 interface ParsedOpt {
   expiry: string;
@@ -302,6 +321,9 @@ async function scanSymbol(
 // ═══════════════════════════════════════════════════════════
 export async function GET() {
   try {
+    // 0. Symbol Universe DB에서 동적 로드
+    const SECTOR_SYMBOLS = await loadScannerSymbols();
+    
     // 1. 모든 종목 시세 병렬 조회
     const quotes = await fetchYahooQuotes(SECTOR_SYMBOLS);
 

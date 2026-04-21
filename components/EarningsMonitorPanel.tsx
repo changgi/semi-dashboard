@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -245,11 +246,16 @@ function EarningsCard({ w }: { w: EarningsWatch }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-[14px] tick font-bold hover:bright"
+              className="hover:opacity-80"
             >
-              {w.symbol}
+              <SymbolDisplay
+                meta={{ symbol: w.symbol, displayName: w.name }}
+                size="md"
+                variant="inline"
+                showFlag={true}
+                showBadges={false}
+              />
             </a>
-            <span className="text-[11px] kr">{w.name}</span>
             <span
               className="text-[8px] px-1.5 py-0.5 rounded kr font-bold"
               style={{ background: impactColor, color: "white" }}

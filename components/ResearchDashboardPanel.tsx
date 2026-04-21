@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -315,9 +316,14 @@ function CorrelationsTab({ correlations }: { correlations: any[] }) {
       {correlations.map((c, i) => {
         const abs = Math.abs(c.correlation);
         const color = c.correlation > 0.4 ? "#00ff88" : c.correlation < -0.4 ? "#ff3860" : "#aaaaaa";
+        const [symA, symB] = (c.pair ?? "").split(" - ");
         return (
           <div key={i} className="flex items-center gap-2 text-[10px] kr py-1.5 border-b border-[var(--border)]/50">
-            <span className="font-mono flex-1 tick">{c.pair}</span>
+            <span className="flex-1 flex items-center gap-1">
+              {symA && <SymbolDisplay meta={{ symbol: symA }} size="xs" variant="inline" showFlag={false} showBadges={false} showName={false} />}
+              <span className="dim">↔</span>
+              {symB && <SymbolDisplay meta={{ symbol: symB }} size="xs" variant="inline" showFlag={false} showBadges={false} showName={false} />}
+            </span>
             <span className="w-20 text-right font-bold" style={{ color }}>
               {c.correlation > 0 ? "+" : ""}{c.correlation.toFixed(3)}
             </span>

@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 
 const fetcher = safeFetcher;
 
@@ -337,9 +338,16 @@ function OverviewTab({
                   href={`/stock/${s.symbol}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[12px] tick font-bold hover:bright"
+                  className="hover:opacity-80"
                 >
-                  {s.symbol}
+                  <SymbolDisplay
+                    meta={{ symbol: s.symbol }}
+                    size="sm"
+                    variant="inline"
+                    showFlag={true}
+                    showBadges={false}
+                    showName={false}
+                  />
                 </a>
                 <div className="flex-1 h-1.5 bg-[var(--border)] rounded overflow-hidden">
                   <div
