@@ -16,7 +16,8 @@
     { "path": "/api/cron/verify-signals",       "schedule": "0 5 * * *" },
     { "path": "/api/cron/warehouse-snapshot",   "schedule": "30 15 * * *" },
     { "path": "/api/cron/auto-insight",          "schedule": "0 16 * * *" },
-    { "path": "/api/cron/universe-expand",      "schedule": "30 16 * * *" }
+    { "path": "/api/cron/universe-expand",      "schedule": "30 16 * * *" },
+    { "path": "/api/cron/portfolio-alerts",     "schedule": "*/5 * * * *" }
   ],
   "functions": {
     "app/api/cron/**": { "maxDuration": 300 }

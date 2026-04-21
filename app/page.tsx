@@ -77,6 +77,7 @@ import { OpportunityTrackerPanel } from "@/components/OpportunityTrackerPanel";
 import { RecoveryPathPanel } from "@/components/RecoveryPathPanel";
 import { TradeIdeasPanel } from "@/components/TradeIdeasPanel";
 import { DailyBriefingHero } from "@/components/DailyBriefingHero";
+import { AlertBanner } from "@/components/AlertBanner";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -210,6 +211,13 @@ export default function Dashboard() {
         <div id="morning-brief" className="col-span-12">
           <PanelErrorBoundary panelName="Morning Brief">
             <MorningBriefPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🚨 ALERT BANNER - 긴급 경보 (최최상단) */}
+        <div id="alert-banner" className="col-span-12">
+          <PanelErrorBoundary panelName="Alert Banner">
+            <AlertBanner />
           </PanelErrorBoundary>
         </div>
 
