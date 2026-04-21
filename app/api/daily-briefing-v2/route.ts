@@ -155,15 +155,18 @@ export async function GET(req: NextRequest) {
     const todayActions = (ideas.ideas ?? [])
       .filter((i: any) => i.urgency === "today" || (i.urgency === "this_week" && i.confidence >= 75))
       .slice(0, 3)
-      .map((i: any, idx: number) => ({
-        rank: idx + 1,
-        action: i.action,
-        symbol: i.symbol,
-        name: i.name,
-        reason: i.reasoning.substring(0, 100) + (i.reasoning.length > 100 ? "..." : ""),
-        urgency: i.urgencyLabel,
-        confidence: i.confidence,
-      }));
+      .map((i: any, idx: number) => {
+        const reasonText = i.reasoning ?? "";
+        return {
+          rank: idx + 1,
+          action: i.action,
+          symbol: i.symbol,
+          name: i.name,
+          reason: reasonText.substring(0, 100) + (reasonText.length > 100 ? "..." : ""),
+          urgency: i.urgencyLabel ?? "",
+          confidence: i.confidence ?? 50,
+        };
+      });
     
     // 6. 시장 이벤트 (다음 7일)
     const today = new Date().toISOString().split("T")[0];

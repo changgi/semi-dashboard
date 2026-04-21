@@ -14,6 +14,7 @@ const SECTIONS = [
   { id: "portfolio-simulator", icon: "🎮", label: "시나리오 시뮬",  group: "daily" },
   { id: "opportunity-finder",  icon: "🎯", label: "기회 탐지기",    group: "daily" },
   { id: "recovery-path",       icon: "🔄", label: "복구 경로",      group: "daily" },
+  { id: "exit-strategy",       icon: "🎯", label: "출구 전략",      group: "daily" },
   { id: "opportunity-tracker", icon: "📊", label: "성과 추적",      group: "daily" },
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },

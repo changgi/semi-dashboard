@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
           type: "earnings_imminent",
           symbol: e.symbol,
           title: `📅 ${e.symbol} 실적 D-${daysUntil}`,
-          message: `${e.company_name} ${e.timing} · 포트 영향 $${totalExposure.toFixed(0)} · 대응 필요`,
+          message: `${e.company_name ?? e.symbol} ${e.timing ?? ""} · 포트 영향 $${totalExposure.toFixed(0)} · 대응 필요`,
           affectedValue: totalExposure,
         });
       }

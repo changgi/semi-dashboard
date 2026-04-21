@@ -78,6 +78,8 @@ import { RecoveryPathPanel } from "@/components/RecoveryPathPanel";
 import { TradeIdeasPanel } from "@/components/TradeIdeasPanel";
 import { DailyBriefingHero } from "@/components/DailyBriefingHero";
 import { AlertBanner } from "@/components/AlertBanner";
+import { MarketPulse } from "@/components/MarketPulse";
+import { ExitStrategyPanel } from "@/components/ExitStrategyPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -214,6 +216,13 @@ export default function Dashboard() {
           </PanelErrorBoundary>
         </div>
 
+        {/* ⏰ MARKET PULSE - 시계 + 다음 이벤트 + 포트 요약 (최상단) */}
+        <div id="market-pulse" className="col-span-12">
+          <PanelErrorBoundary panelName="Market Pulse">
+            <MarketPulse />
+          </PanelErrorBoundary>
+        </div>
+
         {/* 🚨 ALERT BANNER - 긴급 경보 (최최상단) */}
         <div id="alert-banner" className="col-span-12">
           <PanelErrorBoundary panelName="Alert Banner">
@@ -281,6 +290,16 @@ export default function Dashboard() {
             <div className="text-[11px] tick font-bold kr mb-2">🔄 복구 경로 · 손실 복구 전략</div>
             <PanelErrorBoundary panelName="Recovery Path">
               <RecoveryPathPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🎯 EXIT STRATEGY - 각 포지션별 익절/손절 레벨 */}
+        <div id="exit-strategy" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🎯 출구 전략 · 포지션별 익절/손절 계획</div>
+            <PanelErrorBoundary panelName="Exit Strategy">
+              <ExitStrategyPanel />
             </PanelErrorBoundary>
           </div>
         </div>
