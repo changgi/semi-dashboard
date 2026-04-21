@@ -94,22 +94,51 @@ export interface YahooQuote {
   marketState?: string; // REGULAR, CLOSED, PRE, POST
 }
 
-export async function fetchYahooQuote(symbol: string): Promise<YahooQuote | null> {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=1m`;
+// 다양한 User-Agent로 rate limit 회피
+const USER_AGENTS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+];
+
+// query1/query2 로테이션
+const YAHOO_HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+
+export async function fetchYahooQuote(symbol: string, retryCount = 0): Promise<YahooQuote | null> {
+  const host = YAHOO_HOSTS[retryCount % 2];
+  const ua = USER_AGENTS[retryCount % USER_AGENTS.length];
+  const url = `https://${host}/v8/finance/chart/${symbol}?range=1d&interval=1m`;
 
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-          "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": ua,
         Accept: "application/json",
+        "Accept-Language": "en-US,en;q=0.9",
       },
       signal: AbortSignal.timeout(8000),
     });
 
-    if (!res.ok) return null;
-    const data = await res.json();
+    if (!res.ok) {
+      // Rate limit (429) or DNS issue (999) → retry with different host/UA
+      if ((res.status === 429 || res.status === 999 || res.status >= 500) && retryCount < 2) {
+        await new Promise(r => setTimeout(r, 300 * (retryCount + 1)));
+        return fetchYahooQuote(symbol, retryCount + 1);
+      }
+      return null;
+    }
+    
+    // Check response body for rate limit indicators
+    const text = await res.text();
+    if (text.includes("DNS cache overflow") || text.includes("Too Many Requests")) {
+      if (retryCount < 2) {
+        await new Promise(r => setTimeout(r, 500 * (retryCount + 1)));
+        return fetchYahooQuote(symbol, retryCount + 1);
+      }
+      return null;
+    }
+    
+    const data = JSON.parse(text);
     const result = data?.chart?.result?.[0];
     if (!result?.meta) return null;
 
@@ -132,6 +161,11 @@ export async function fetchYahooQuote(symbol: string): Promise<YahooQuote | null
       marketState: meta.marketState,
     };
   } catch (e) {
+    // Retry on network errors
+    if (retryCount < 2) {
+      await new Promise(r => setTimeout(r, 300 * (retryCount + 1)));
+      return fetchYahooQuote(symbol, retryCount + 1);
+    }
     return null;
   }
 }

@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { SkeletonBar, SkeletonCards } from "./Skeleton";
 
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolCompact } from "@/components/SymbolDisplay";
 const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
@@ -260,7 +261,7 @@ export function DailySummaryPanel() {
                     className="flex items-center justify-between py-1 px-2 bg-[rgba(0,255,136,0.05)] rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="tick font-bold text-[11px]">{p.symbol}</span>
+                      <SymbolCompact meta={{ symbol: p.symbol }} size="sm" />
                       <span className="text-[8px] dim kr">합의 {p.agreement_level}%</span>
                     </div>
                     <div className="up font-bold text-[11px]">
@@ -285,7 +286,7 @@ export function DailySummaryPanel() {
                     className="flex items-center justify-between py-1 px-2 bg-[rgba(255,56,96,0.05)] rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="tick font-bold text-[11px]">{p.symbol}</span>
+                      <SymbolCompact meta={{ symbol: p.symbol }} size="sm" />
                       <span className="text-[8px] dim kr">합의 {p.agreement_level}%</span>
                     </div>
                     <div className="down font-bold text-[11px]">

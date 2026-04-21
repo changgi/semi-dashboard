@@ -70,6 +70,8 @@ import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { RebalanceHelperPanel } from "@/components/RebalanceHelperPanel";
 import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
+import { PortfolioDiagnosisPanel } from "@/components/PortfolioDiagnosisPanel";
+import { PortfolioSimulatorPanel } from "@/components/PortfolioSimulatorPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -211,6 +213,26 @@ export default function Dashboard() {
           <PanelErrorBoundary panelName="Portfolio CRUD">
             <PortfolioCRUDPanel />
           </PanelErrorBoundary>
+        </div>
+
+        {/* 🩺 PORTFOLIO DIAGNOSIS - 자동 진단 + 리스크 + 액션 플랜 */}
+        <div id="portfolio-diagnosis" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🩺 포트폴리오 진단 · 자동 분석</div>
+            <PanelErrorBoundary panelName="Portfolio Diagnosis">
+              <PortfolioDiagnosisPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🎮 SCENARIO SIMULATOR - 가격 변동 + 매도 시뮬레이션 */}
+        <div id="portfolio-simulator" className="col-span-12 md:col-span-5">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🎮 시나리오 시뮬레이터</div>
+            <PanelErrorBoundary panelName="Portfolio Simulator">
+              <PortfolioSimulatorPanel />
+            </PanelErrorBoundary>
+          </div>
         </div>
 
         {/* 🧠 POSITION GUIDE - AI 종합 판단 + 지금 뭐 해야 하나? */}

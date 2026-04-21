@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { SkeletonBar, SkeletonCards } from "./Skeleton";
 
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 const fetcher = safeFetcher;
 
 // ─────────────────────────────────────────────────────────
@@ -114,10 +115,19 @@ function MajorCard({ stock }: { stock: KrStock }) {
     <div className="border-l-2 border-[var(--amber)] bg-[rgba(255,176,0,0.03)] rounded-r p-3 hover:bg-[rgba(255,176,0,0.06)] transition-colors">
       <div className="flex items-start justify-between mb-2 gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[14px] sm:text-[16px] font-bold bright kr">{stock.name}</span>
-            <span className="text-[8px] dim">{stock.nameEn} · {stock.symbol}</span>
-          </div>
+          <SymbolDisplay
+            meta={{
+              symbol: stock.symbol,
+              displayName: stock.name,
+              country: "KR",
+              isSemi: true,
+            }}
+            size="lg"
+            variant="inline"
+            showFlag={true}
+            showBadges={false}
+            showName={true}
+          />
           <div className="text-[9px] dim kr mt-1 leading-tight">{stock.subtitle}</div>
         </div>
         <span className="text-[7px] tick border border-[var(--amber-dim)] px-1.5 py-0.5 rounded whitespace-nowrap">
@@ -186,8 +196,19 @@ function StockCard({ stock }: { stock: KrStock }) {
     >
       <div className="flex items-start justify-between mb-1 gap-1">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[10px] font-bold bright kr truncate">{stock.name}</span>
+          <SymbolDisplay
+            meta={{
+              symbol: stock.symbol,
+              displayName: stock.name,
+              country: "KR",
+              isSemi: true,
+            }}
+            size="sm"
+            variant="inline"
+            showFlag={false}
+            showBadges={false}
+          />
+          <div className="flex gap-1 mt-0.5">
             {isLeveraged && (
               <span className="text-[7px] px-1 rounded font-bold bg-[rgba(0,255,136,0.15)] text-[#00ff88]">
                 +2x
@@ -198,9 +219,6 @@ function StockCard({ stock }: { stock: KrStock }) {
                 -2x
               </span>
             )}
-          </div>
-          <div className="text-[7px] dim">
-            {stock.symbol}
           </div>
         </div>
       </div>

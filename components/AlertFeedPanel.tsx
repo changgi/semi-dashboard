@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { useState } from "react";
 
 import { safeFetcher } from "@/lib/swr-config";
+import { SymbolDisplay } from "@/components/SymbolDisplay";
 const fetcher = safeFetcher;
 
 // ───────────────────────────────────────────────────────────
@@ -267,9 +268,16 @@ function NotificationCard({ notification: n }: { notification: AlertNotification
                   href={`/stock/${encodeURIComponent(n.symbol)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[9px] tick font-bold text-[var(--amber)] hover:bright"
+                  className="hover:opacity-80"
                 >
-                  📊 {n.symbol} →
+                  <SymbolDisplay
+                    meta={{ symbol: n.symbol }}
+                    size="xs"
+                    variant="inline"
+                    showFlag={true}
+                    showBadges={false}
+                    showName={false}
+                  />
                 </a>
               )}
               {n.actionUrl && (
