@@ -96,12 +96,12 @@ async function analyzeSymbol(
   earningsMap: Map<string, any>
 ): Promise<Opportunity | null> {
   try {
-    // 가격 히스토리 (3개월)
+    // 가격 히스토리 (1개월로 축소 - 성능)
     const history = await fetchYahooHistory(symbol, "3mo");
-    if (!history || history.length < 30) return null;
+    if (!history || history.length < 20) return null;
     
     const closes = history.map((h: any) => h.close).filter((p: number) => p > 0);
-    if (closes.length < 30) return null;
+    if (closes.length < 20) return null;
     
     const currentPrice = quote?.price ?? closes[closes.length - 1];
     const week52Data = history.slice(-252);
@@ -260,15 +260,16 @@ export async function GET(req: NextRequest) {
     
     const supabase = createAdmin();
     
-    // 1. Symbol Universe 스캔 대상 로드 (레버리지 제외, 메인 종목만)
+    // 1. Symbol Universe 스캔 대상 로드 (스마트 선택)
+    // S&P500 + NASDAQ100 + KOSPI100 + 반도체 주요 종목
+    // 레버리지/인버스는 제외 (원주식으로 판단 후 관련 ETF 제시)
     const { data: universe } = await supabase
       .from("symbol_universe")
       .select("*")
       .eq("is_active", true)
-      .or("in_sp500.eq.true,in_nasdaq100.eq.true,in_kospi100.eq.true,is_semi.eq.true")
-      .not("semi_tags", "cs", "{레버리지}")
-      .not("semi_tags", "cs", "{인버스}")
-      .limit(80);  // Yahoo API 속도 고려
+      .or("in_sp500.eq.true,in_nasdaq100.eq.true,is_semi.eq.true")
+      .eq("is_etf", false)  // ETF 제외 (나중에 별도 스캔)
+      .limit(50);  // 50종목 (Vercel 60초 타임아웃 고려)
     
     if (!universe || universe.length === 0) {
       return NextResponse.json({ success: false, error: "Universe empty", opportunities: [] });
@@ -301,10 +302,18 @@ export async function GET(req: NextRequest) {
     // 4. 실시간 시세 (병렬)
     const quotes = await fetchYahooQuotes(symbols);
     
-    // 5. 병렬 분석 (청크 단위)
+    // 5. 병렬 분석 (타임박스 적용 - 45초 초과 시 중단)
     const opportunities: Opportunity[] = [];
-    const chunkSize = 15;
+    const chunkSize = 20;
+    const startTime = Date.now();
+    const timeBudgetMs = 45000;  // 45초
+    let processedCount = 0;
+    
     for (let i = 0; i < symbols.length; i += chunkSize) {
+      if (Date.now() - startTime > timeBudgetMs) {
+        console.warn(`[opportunities] 시간 예산 초과, ${processedCount}/${symbols.length} 처리 후 중단`);
+        break;
+      }
       const chunk = symbols.slice(i, i + chunkSize);
       const results = await Promise.all(
         chunk.map(sym => {
@@ -313,6 +322,7 @@ export async function GET(req: NextRequest) {
         })
       );
       for (const r of results) {
+        processedCount++;
         if (r && r.totalScore >= minScore) {
           r.inPortfolio = portfolioSymbols.has(r.symbol);
           opportunities.push(r);
@@ -347,14 +357,28 @@ export async function GET(req: NextRequest) {
     opportunities.sort((a, b) => b.totalScore - a.totalScore);
     const top = opportunities.slice(0, limit);
     
+    // 8. DB 캐싱 (재스캔 부하 감소용)
+    try {
+      await supabase.from("research_findings").insert({
+        finding_type: "opportunity_scan",
+        severity: "info",
+        title: `Opportunity Scan · ${mode} · ${top.length}종목`,
+        summary: `${mode} 모드 · ${symbols.length}종목 스캔, ${opportunities.length}개 기회 포착, 상위 ${top.length}개 반환`,
+        data: { mode, top: top.slice(0, 5).map(o => ({ symbol: o.symbol, score: o.totalScore, signals: o.signals.map(s => s.type) })) },
+        confidence_score: 0.8,
+      });
+    } catch {}
+    
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
       mode,
       scanned: symbols.length,
+      processed: processedCount,
       found: opportunities.length,
       returned: top.length,
       opportunities: top,
+      elapsedMs: Date.now() - startTime,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";

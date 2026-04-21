@@ -73,7 +73,10 @@ import { PortfolioCRUDPanel } from "@/components/PortfolioCRUDPanel";
 import { PortfolioDiagnosisPanel } from "@/components/PortfolioDiagnosisPanel";
 import { PortfolioSimulatorPanel } from "@/components/PortfolioSimulatorPanel";
 import { OpportunityFinderPanel } from "@/components/OpportunityFinderPanel";
+import { OpportunityTrackerPanel } from "@/components/OpportunityTrackerPanel";
 import { RecoveryPathPanel } from "@/components/RecoveryPathPanel";
+import { TradeIdeasPanel } from "@/components/TradeIdeasPanel";
+import { DailyBriefingHero } from "@/components/DailyBriefingHero";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -210,6 +213,23 @@ export default function Dashboard() {
           </PanelErrorBoundary>
         </div>
 
+        {/* 🌅 DAILY BRIEFING - 오늘 5분 요약 (최최상단) */}
+        <div id="daily-briefing" className="col-span-12">
+          <PanelErrorBoundary panelName="Daily Briefing">
+            <DailyBriefingHero />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 💡 TRADE IDEAS - 오늘의 TOP 매매 아이디어 */}
+        <div id="trade-ideas" className="col-span-12">
+          <div className="border-2 border-[var(--amber)] rounded p-3 bg-[rgba(255,176,0,0.03)]">
+            <div className="text-[12px] tick font-bold kr mb-2">💡 오늘의 매매 아이디어 · AI 통합 추천</div>
+            <PanelErrorBoundary panelName="Trade Ideas">
+              <TradeIdeasPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
         {/* 💼 PORTFOLIO MANAGER - 종목 추가/수정/삭제 */}
         <div id="portfolio-crud" className="col-span-12">
           <PanelErrorBoundary panelName="Portfolio CRUD">
@@ -253,6 +273,16 @@ export default function Dashboard() {
             <div className="text-[11px] tick font-bold kr mb-2">🔄 복구 경로 · 손실 복구 전략</div>
             <PanelErrorBoundary panelName="Recovery Path">
               <RecoveryPathPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 📊 OPPORTUNITY TRACKER - 추천 성과 추적 */}
+        <div id="opportunity-tracker" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">📊 추천 성과 추적 · 시스템 신뢰도 검증</div>
+            <PanelErrorBoundary panelName="Opportunity Tracker">
+              <OpportunityTrackerPanel />
             </PanelErrorBoundary>
           </div>
         </div>

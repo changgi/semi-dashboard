@@ -7,11 +7,14 @@ import { useState, useEffect } from "react";
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "morning-brief",    icon: "☀️", label: "아침 요약",        group: "daily" },
+  { id: "daily-briefing",   icon: "🌅", label: "오늘의 브리핑",   group: "daily" },
+  { id: "trade-ideas",      icon: "💡", label: "매매 아이디어",   group: "daily" },
   { id: "portfolio-crud",   icon: "💼", label: "보유종목 관리",    group: "daily" },
   { id: "portfolio-diagnosis", icon: "🩺", label: "포트 진단",      group: "daily" },
   { id: "portfolio-simulator", icon: "🎮", label: "시나리오 시뮬",  group: "daily" },
   { id: "opportunity-finder",  icon: "🎯", label: "기회 탐지기",    group: "daily" },
   { id: "recovery-path",       icon: "🔄", label: "복구 경로",      group: "daily" },
+  { id: "opportunity-tracker", icon: "📊", label: "성과 추적",      group: "daily" },
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
   { id: "weekly-strategy",  icon: "📅", label: "주간 전략",        group: "daily" },
