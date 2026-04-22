@@ -95,6 +95,8 @@ import DeepAnalysisPanel from "@/components/DeepAnalysisPanel";
 import MarketRegimePanel from "@/components/MarketRegimePanel";
 import TradeExecutionCard from "@/components/TradeExecutionCard";
 import PostEarningsScenarioPanel from "@/components/PostEarningsScenarioPanel";
+import PortfolioAnalyticsPanel from "@/components/PortfolioAnalyticsPanel";
+import RebalancingPanel from "@/components/RebalancingPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -256,6 +258,20 @@ export default function Dashboard() {
         <div id="market-regime" className="col-span-12">
           <PanelErrorBoundary panelName="Market Regime">
             <MarketRegimePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📐 PORTFOLIO ANALYTICS - 포트폴리오 정량 분석 */}
+        <div id="portfolio-analytics" className="col-span-12">
+          <PanelErrorBoundary panelName="Portfolio Analytics">
+            <PortfolioAnalyticsPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* ⚖️ REBALANCING - 리밸런싱 엔진 (매도 → 현금 → 재투자) */}
+        <div id="rebalancing" className="col-span-12">
+          <PanelErrorBoundary panelName="Rebalancing">
+            <RebalancingPanel />
           </PanelErrorBoundary>
         </div>
 
