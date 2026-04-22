@@ -91,6 +91,10 @@ import { RecoveryPlanPanel } from "@/components/RecoveryPlanPanel";
 import { ArchiveReviewPanel } from "@/components/ArchiveReviewPanel";
 import { TodaysFocusCard } from "@/components/TodaysFocusCard";
 import { MorningRoutinePanel } from "@/components/MorningRoutinePanel";
+import DeepAnalysisPanel from "@/components/DeepAnalysisPanel";
+import MarketRegimePanel from "@/components/MarketRegimePanel";
+import TradeExecutionCard from "@/components/TradeExecutionCard";
+import PostEarningsScenarioPanel from "@/components/PostEarningsScenarioPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -231,6 +235,34 @@ export default function Dashboard() {
         <div id="todays-focus" className="col-span-12">
           <PanelErrorBoundary panelName="Todays Focus">
             <TodaysFocusCard />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🚨 TRADE EXECUTION CARD - 오늘의 긴급 실행 주문 (TSLL 매도 등) */}
+        <div id="trade-execution" className="col-span-12">
+          <PanelErrorBoundary panelName="Trade Execution Card">
+            <TradeExecutionCard title="🚨 오늘 밤 실행할 주문 · 22:30 KST" />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🎯 POST-EARNINGS SCENARIOS - 실적 발표 시나리오별 행동 강령 */}
+        <div id="post-earnings" className="col-span-12">
+          <PanelErrorBoundary panelName="Post-Earnings Scenarios">
+            <PostEarningsScenarioPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🌐 MARKET REGIME - 시황 국면 진단 */}
+        <div id="market-regime" className="col-span-12">
+          <PanelErrorBoundary panelName="Market Regime">
+            <MarketRegimePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔬 DEEP ANALYSIS - 차트+기술+예측+이유 통합 분석 엔진 */}
+        <div id="deep-analysis" className="col-span-12">
+          <PanelErrorBoundary panelName="Deep Analysis">
+            <DeepAnalysisPanel initialSymbol="ORCL" />
           </PanelErrorBoundary>
         </div>
 

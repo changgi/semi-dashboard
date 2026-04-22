@@ -7,6 +7,10 @@ import { useState, useEffect } from "react";
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "todays-focus",     icon: "🎯", label: "오늘의 포커스",    group: "daily" },
+  { id: "trade-execution",  icon: "🚨", label: "실행 주문 카드",    group: "daily" },
+  { id: "post-earnings",    icon: "📰", label: "실적 시나리오",    group: "daily" },
+  { id: "market-regime",    icon: "🌐", label: "시황 국면",        group: "daily" },
+  { id: "deep-analysis",    icon: "🔬", label: "다각도 분석",      group: "daily" },
   { id: "event-countdown",  icon: "⏱", label: "이벤트 카운트다운", group: "daily" },
   { id: "execution-tracker",icon: "📋", label: "실행 추적",        group: "daily" },
   { id: "morning-routine",  icon: "☀️", label: "아침 5분 루틴",   group: "daily" },
