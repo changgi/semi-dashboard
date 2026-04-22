@@ -80,6 +80,17 @@ import { DailyBriefingHero } from "@/components/DailyBriefingHero";
 import { AlertBanner } from "@/components/AlertBanner";
 import { MarketPulse } from "@/components/MarketPulse";
 import { ExitStrategyPanel } from "@/components/ExitStrategyPanel";
+import { TradeJournalPanel } from "@/components/TradeJournalPanel";
+import { SmartAlertsPanel } from "@/components/SmartAlertsPanel";
+import { StockAnalyzerPanel } from "@/components/StockAnalyzerPanel";
+import { PositionSizerPanel } from "@/components/PositionSizerPanel";
+import { EventCountdown } from "@/components/EventCountdown";
+import { ExecutionTracker } from "@/components/ExecutionTracker";
+import { FloatingCTA } from "@/components/FloatingCTA";
+import { RecoveryPlanPanel } from "@/components/RecoveryPlanPanel";
+import { ArchiveReviewPanel } from "@/components/ArchiveReviewPanel";
+import { TodaysFocusCard } from "@/components/TodaysFocusCard";
+import { MorningRoutinePanel } from "@/components/MorningRoutinePanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -216,6 +227,38 @@ export default function Dashboard() {
           </PanelErrorBoundary>
         </div>
 
+        {/* 🎯 TODAY'S FOCUS - 오늘 딱 한 가지 (최최최상단) */}
+        <div id="todays-focus" className="col-span-12">
+          <PanelErrorBoundary panelName="Todays Focus">
+            <TodaysFocusCard />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* ⏱ EVENT COUNTDOWN - 시장 이벤트 실시간 카운트다운 */}
+        <div id="event-countdown" className="col-span-12">
+          <PanelErrorBoundary panelName="Event Countdown">
+            <EventCountdown />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📋 EXECUTION TRACKER - 오늘 실행 목록 체크 */}
+        <div id="execution-tracker" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <PanelErrorBoundary panelName="Execution Tracker">
+              <ExecutionTracker />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* ☀️ MORNING ROUTINE - 아침 5분 체크리스트 */}
+        <div id="morning-routine" className="col-span-12 md:col-span-5">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <PanelErrorBoundary panelName="Morning Routine">
+              <MorningRoutinePanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
         {/* ⏰ MARKET PULSE - 시계 + 다음 이벤트 + 포트 요약 (최상단) */}
         <div id="market-pulse" className="col-span-12">
           <PanelErrorBoundary panelName="Market Pulse">
@@ -294,12 +337,72 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* 📆 RECOVERY PLAN - 6주 단계별 플랜 (인터랙티브) */}
+        <div id="recovery-plan" className="col-span-12">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">📆 복구 플랜 · 주차별 태스크 + 체크</div>
+            <PanelErrorBoundary panelName="Recovery Plan">
+              <RecoveryPlanPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 📂 ARCHIVE REVIEW - 누적 스냅샷 + 성과 분석 */}
+        <div id="archive-review" className="col-span-12">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">📂 아카이브 검토 · 자동 누적 + 조회 + 분석</div>
+            <PanelErrorBoundary panelName="Archive Review">
+              <ArchiveReviewPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
         {/* 🎯 EXIT STRATEGY - 각 포지션별 익절/손절 레벨 */}
         <div id="exit-strategy" className="col-span-12 md:col-span-7">
           <div className="border border-[var(--border)] rounded p-3 bg-black/20">
             <div className="text-[11px] tick font-bold kr mb-2">🎯 출구 전략 · 포지션별 익절/손절 계획</div>
             <PanelErrorBoundary panelName="Exit Strategy">
               <ExitStrategyPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 📔 TRADE JOURNAL - 매매 기록 + 학습 */}
+        <div id="trade-journal" className="col-span-12 md:col-span-5">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">📔 매매 저널 · 기록 + 패턴 분석</div>
+            <PanelErrorBoundary panelName="Trade Journal">
+              <TradeJournalPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🔔 SMART ALERTS - 3-layer 알림 */}
+        <div id="smart-alerts" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🔔 스마트 알림 · 뭐+왜+뭘해야</div>
+            <PanelErrorBoundary panelName="Smart Alerts">
+              <SmartAlertsPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 🔍 STOCK ANALYZER - 단일 종목 심층 분석 */}
+        <div id="stock-analyzer" className="col-span-12 md:col-span-7">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">🔍 종목 심층 분석 · 7차원 AI 평가</div>
+            <PanelErrorBoundary panelName="Stock Analyzer">
+              <StockAnalyzerPanel />
+            </PanelErrorBoundary>
+          </div>
+        </div>
+
+        {/* 📏 POSITION SIZER - 적정 매수량 계산 */}
+        <div id="position-sizer" className="col-span-12 md:col-span-5">
+          <div className="border border-[var(--border)] rounded p-3 bg-black/20">
+            <div className="text-[11px] tick font-bold kr mb-2">📏 매수량 계산기 · Kelly + 리스크</div>
+            <PanelErrorBoundary panelName="Position Sizer">
+              <PositionSizerPanel />
             </PanelErrorBoundary>
           </div>
         </div>
@@ -725,6 +828,9 @@ export default function Dashboard() {
 
       {/* 🎯 플로팅 결정 바 - 하단 항상 표시 */}
       <FloatingDecisionBar />
+
+      {/* ⚡ 플로팅 CTA - Today's Focus 가려지면 표시 */}
+      <FloatingCTA />
 
       {/* 🔔 푸시 알림 - 우하단 플로팅 버튼 */}
       <PushNotifications />

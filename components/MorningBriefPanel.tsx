@@ -132,23 +132,48 @@ export function MorningBriefPanel() {
         {(data.thisWeekEarnings ?? []).length > 0 && (
           <div className="border border-[var(--border)] rounded p-3">
             <div className="text-[10px] tick font-bold kr mb-2">📊 이번 주 실적</div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {(data.thisWeekEarnings ?? []).map((e, i) => {
-                const impactEmoji = e.impact === "direct" ? "🎯" : e.impact === "indirect" ? "🔗" : "👁️";
+                const isDirect = e.impact === "direct";
+                const isIndirect = e.impact === "indirect";
+                const impactLabel = isDirect ? "보유" : isIndirect ? "연관" : "관찰";
+                const impactColor = isDirect ? "#ffb000" : isIndirect ? "#7ec8ff" : "#666";
+                const dLabel = e.daysUntil === 0 ? "D-0" : `D-${e.daysUntil}`;
                 return (
-                  <div key={i} className="flex items-center justify-between text-[10px] kr">
-                    <span className="flex items-center gap-1.5">
-                      <SymbolDisplay
-                        meta={{ symbol: e.symbol }}
-                        size="sm"
-                        variant="inline"
-                        showFlag={true}
-                        showBadges={false}
-                        showName={false}
-                      />
-                      <span className="dim">D-{e.daysUntil}</span>
+                  <div key={i} className="flex items-center justify-between gap-2 py-0.5">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span
+                        className="font-bold"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: "14px",
+                          color: "#ffd56b",
+                          letterSpacing: "0.05em",
+                          minWidth: "68px",
+                        }}
+                      >
+                        {e.symbol}
+                      </span>
+                      <span
+                        className="font-bold text-[11px]"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          color: e.daysUntil === 0 ? "#ff3860" : e.daysUntil <= 1 ? "#ffd93d" : "#888",
+                        }}
+                      >
+                        {dLabel}
+                      </span>
+                    </div>
+                    <span
+                      className="text-[8px] px-1.5 py-0.5 rounded kr flex-shrink-0"
+                      style={{
+                        color: impactColor,
+                        border: `1px solid ${impactColor}60`,
+                        background: `${impactColor}10`,
+                      }}
+                    >
+                      {impactLabel}
                     </span>
-                    <span className="dim">{impactEmoji}</span>
                   </div>
                 );
               })}
@@ -160,13 +185,51 @@ export function MorningBriefPanel() {
         {(data.urgentEvents ?? []).length > 0 && (
           <div className="border border-[#ff6644]/30 bg-[rgba(255,102,68,0.03)] rounded p-3">
             <div className="text-[10px] font-bold kr mb-2" style={{ color: "#ff6644" }}>🚨 D-5 이내 이벤트</div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {(data.urgentEvents ?? []).slice(0, 4).map((e, i) => {
                 const emoji = e.daysUntil === 0 ? "🚨" : e.daysUntil <= 1 ? "🔥" : "⏰";
+                const dColor = e.daysUntil === 0 ? "#ff3860" : e.daysUntil <= 1 ? "#ffd93d" : "#ffb000";
+                
+                // 제목에서 심볼(TSLA) 같은 괄호 안 심볼 추출
+                const symbolMatch = e.title.match(/\(([A-Z0-9]+(?:\.[A-Z]{2})?)\)/);
+                const ticker = symbolMatch?.[1];
+                const titleWithoutTicker = ticker 
+                  ? e.title.replace(/\s*\([A-Z0-9.]+\)\s*/, " ").trim()
+                  : e.title;
+                
                 return (
-                  <div key={i} className="text-[10px] kr">
-                    <div>{emoji} <span className="tick font-bold">D-{e.daysUntil}</span> {e.title}</div>
-                    {e.impact && <div className="text-[8px] dim mt-0.5 pl-5">{e.impact}</div>}
+                  <div key={i} className="text-[10px] kr py-0.5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[14px] flex-shrink-0">{emoji}</span>
+                      <span
+                        className="font-bold"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: "14px",
+                          color: dColor,
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        D-{e.daysUntil}
+                      </span>
+                      {ticker && (
+                        <span
+                          className="font-bold"
+                          style={{
+                            fontFamily: "'Bebas Neue', sans-serif",
+                            fontSize: "13px",
+                            color: "#ffd56b",
+                            letterSpacing: "0.05em",
+                          }}
+                        >
+                          {ticker}
+                        </span>
+                      )}
+                      <span className="flex-1 kr text-[10px]">{titleWithoutTicker}</span>
+                    </div>
+                    {e.impact && (
+                      <div className="text-[8px] dim mt-0.5 pl-6 kr">{e.impact}</div>
+                    )}
                   </div>
                 );
               })}

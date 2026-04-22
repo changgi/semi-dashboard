@@ -257,6 +257,46 @@ export const swrDefaultConfig = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════
+// SWR 새로고침 간격 프리셋 (통일된 주기)
+// ═══════════════════════════════════════════════════════════
+export const REFRESH_INTERVALS = {
+  REAL_TIME: 30 * 1000,         // 30초 - 시세, 경보
+  FREQUENT: 60 * 1000,          // 1분 - 경보 배너
+  MODERATE: 3 * 60 * 1000,      // 3분 - Trade Ideas
+  SLOW: 5 * 60 * 1000,          // 5분 - 브리핑, 진단, 기회
+  LAZY: 10 * 60 * 1000,         // 10분 - 성과 추적
+  STATIC: 30 * 60 * 1000,       // 30분 - 거의 변하지 않는 데이터
+} as const;
+
+// 기본 SWR 옵션 프리셋
+export const SWR_PRESETS = {
+  realtime: {
+    refreshInterval: REFRESH_INTERVALS.REAL_TIME,
+    revalidateOnFocus: true,
+  },
+  frequent: {
+    refreshInterval: REFRESH_INTERVALS.FREQUENT,
+    revalidateOnFocus: false,
+  },
+  moderate: {
+    refreshInterval: REFRESH_INTERVALS.MODERATE,
+    revalidateOnFocus: false,
+  },
+  slow: {
+    refreshInterval: REFRESH_INTERVALS.SLOW,
+    revalidateOnFocus: false,
+  },
+  lazy: {
+    refreshInterval: REFRESH_INTERVALS.LAZY,
+    revalidateOnFocus: false,
+  },
+  static: {
+    refreshInterval: REFRESH_INTERVALS.STATIC,
+    revalidateOnFocus: false,
+  },
+} as const;
+
 // 디버그 헬퍼 (브라우저 콘솔에서 __semi_cache.stats() 호출 가능)
 if (typeof window !== "undefined") {
   (window as any).__semi_cache = {

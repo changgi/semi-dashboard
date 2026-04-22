@@ -1,8 +1,10 @@
 "use client";
 
 import useSWR from "swr";
+import { useState } from "react";
 import { safeFetcher } from "@/lib/swr-config";
 import { SymbolDisplay } from "@/components/SymbolDisplay";
+import { BriefingExportModal } from "@/components/BriefingExportModal";
 
 const fetcher = safeFetcher;
 
@@ -76,6 +78,8 @@ export function DailyBriefingHero() {
     { refreshInterval: 5 * 60 * 1000 }
   );
   
+  const [exportOpen, setExportOpen] = useState(false);
+  
   if (isLoading || !data?.success) {
     return (
       <div className="p-6 border-2 border-[var(--border)] rounded bg-black/20 text-center">
@@ -91,6 +95,7 @@ export function DailyBriefingHero() {
   const generatedDate = new Date(b.generatedAt).toLocaleDateString("ko-KR", { month: "short", day: "numeric", weekday: "short" });
   
   return (
+    <>
     <div
       className="border-2 rounded p-4 space-y-4"
       style={{ borderColor: mood.border, background: mood.bg }}
@@ -101,6 +106,18 @@ export function DailyBriefingHero() {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] dim kr tracking-widest">DAILY BRIEFING</span>
             <span className="text-[9px] dim">· {generatedDate} {generatedTime}</span>
+            <button
+              onClick={() => setExportOpen(true)}
+              className="ml-auto text-[9px] px-2 py-1 border rounded kr font-bold"
+              style={{
+                borderColor: mood.border,
+                color: mood.border,
+                background: "rgba(0,0,0,0.3)",
+              }}
+              title="PDF/프린트로 내보내기"
+            >
+              📄 내보내기
+            </button>
           </div>
           <div className="flex items-baseline gap-3 flex-wrap">
             <div
@@ -317,5 +334,8 @@ export function DailyBriefingHero() {
         </div>
       )}
     </div>
+    
+    <BriefingExportModal isOpen={exportOpen} onClose={() => setExportOpen(false)} />
+    </>
   );
 }

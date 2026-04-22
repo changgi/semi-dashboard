@@ -6,6 +6,10 @@ import { useState, useEffect } from "react";
 // 섹션 정의 (page.tsx의 id와 매칭)
 // ───────────────────────────────────────────────────────────
 const SECTIONS = [
+  { id: "todays-focus",     icon: "🎯", label: "오늘의 포커스",    group: "daily" },
+  { id: "event-countdown",  icon: "⏱", label: "이벤트 카운트다운", group: "daily" },
+  { id: "execution-tracker",icon: "📋", label: "실행 추적",        group: "daily" },
+  { id: "morning-routine",  icon: "☀️", label: "아침 5분 루틴",   group: "daily" },
   { id: "morning-brief",    icon: "☀️", label: "아침 요약",        group: "daily" },
   { id: "daily-briefing",   icon: "🌅", label: "오늘의 브리핑",   group: "daily" },
   { id: "trade-ideas",      icon: "💡", label: "매매 아이디어",   group: "daily" },
@@ -14,7 +18,13 @@ const SECTIONS = [
   { id: "portfolio-simulator", icon: "🎮", label: "시나리오 시뮬",  group: "daily" },
   { id: "opportunity-finder",  icon: "🎯", label: "기회 탐지기",    group: "daily" },
   { id: "recovery-path",       icon: "🔄", label: "복구 경로",      group: "daily" },
+  { id: "recovery-plan",       icon: "📆", label: "6주 복구 플랜",  group: "daily" },
+  { id: "archive-review",      icon: "📂", label: "아카이브 검토",    group: "daily" },
   { id: "exit-strategy",       icon: "🎯", label: "출구 전략",      group: "daily" },
+  { id: "trade-journal",       icon: "📔", label: "매매 저널",      group: "daily" },
+  { id: "smart-alerts",        icon: "🔔", label: "스마트 알림",    group: "daily" },
+  { id: "stock-analyzer",      icon: "🔍", label: "종목 분석",      group: "daily" },
+  { id: "position-sizer",      icon: "📏", label: "매수량 계산",    group: "daily" },
   { id: "opportunity-tracker", icon: "📊", label: "성과 추적",      group: "daily" },
   { id: "position-guide",   icon: "🧠", label: "AI 포지션 가이드", group: "daily" },
   { id: "strategy-assistant",icon: "💬", label: "전략 상담",        group: "daily" },
