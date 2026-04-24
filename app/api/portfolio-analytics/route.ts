@@ -118,14 +118,23 @@ const LEVERAGE_MAP: Record<string, string> = {
 
 async function fetchPortfolio(): Promise<Position[]> {
   const supabase = createAdmin();
-  const { data, error } = await supabase.from("portfolio").select("*");
+  const { data, error } = await supabase
+    .from("portfolio_holdings")
+    .select("*")
+    .eq("is_active", true);
   if (error) throw error;
   if (!data) return [];
+
+  const LEVERAGE_BY_SYMBOL: Record<string, number> = {
+    ORCX: 2, ORCU: 2, ORCS: 2, AMZU: 2, TSLL: 2,
+    NVDU: 2, NVDL: 2, TQQQ: 3, SOXL: 3, TNA: 3,
+  };
 
   const positions: Position[] = [];
   for (const row of data) {
     const sym = row.symbol;
     const underlying = LEVERAGE_MAP[sym] ?? sym;
+    const leverage = LEVERAGE_BY_SYMBOL[sym] ?? 1;
     let currentPrice: number | null = null;
     try {
       const bars = await fetchYahooHistory(sym, "5d");
@@ -138,11 +147,11 @@ async function fetchPortfolio(): Promise<Position[]> {
       symbol: sym,
       shares: row.shares,
       avgCost: row.avg_cost,
-      leverage: row.leverage ?? 1,
+      leverage,
       costBasis,
       currentPrice,
       marketValue,
-      weight: 0, // 나중에 계산
+      weight: 0,
       pnl: marketValue - costBasis,
       pnlPct: ((price / row.avg_cost) - 1) * 100,
       underlying,

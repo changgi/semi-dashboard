@@ -65,13 +65,22 @@ const REINVESTMENT_CANDIDATES = [
 
 async function fetchPortfolio(): Promise<{ positions: Position[]; cash: number }> {
   const supabase = createAdmin();
-  const { data } = await supabase.from("portfolio").select("*");
+  const { data } = await supabase
+    .from("portfolio_holdings")
+    .select("*")
+    .eq("is_active", true);
   if (!data || data.length === 0) return { positions: [], cash: 0 };
+
+  const LEVERAGE_BY_SYMBOL: Record<string, number> = {
+    ORCX: 2, ORCU: 2, ORCS: 2, AMZU: 2, TSLL: 2,
+    NVDU: 2, NVDL: 2, TQQQ: 3, SOXL: 3, TNA: 3,
+  };
 
   const positions: Position[] = [];
   for (const row of data) {
     const sym = row.symbol;
     const underlying = LEVERAGE_MAP[sym] ?? sym;
+    const leverage = LEVERAGE_BY_SYMBOL[sym] ?? 1;
     let currentPrice = row.avg_cost;
     try {
       const q = await fetchYahooQuote(sym);
@@ -82,7 +91,7 @@ async function fetchPortfolio(): Promise<{ positions: Position[]; cash: number }
       symbol: sym,
       shares: row.shares,
       avgCost: row.avg_cost,
-      leverage: row.leverage ?? 1,
+      leverage,
       underlying,
       currentPrice,
       marketValue,

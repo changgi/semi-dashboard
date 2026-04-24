@@ -97,6 +97,11 @@ import TradeExecutionCard from "@/components/TradeExecutionCard";
 import PostEarningsScenarioPanel from "@/components/PostEarningsScenarioPanel";
 import PortfolioAnalyticsPanel from "@/components/PortfolioAnalyticsPanel";
 import RebalancingPanel from "@/components/RebalancingPanel";
+import SignalFusionPanel from "@/components/SignalFusionPanel";
+import TechDivergencePanel from "@/components/TechDivergencePanel";
+import EarningsRealityCheckPanel from "@/components/EarningsRealityCheckPanel";
+import ThirteenFTrackerPanel from "@/components/ThirteenFTrackerPanel";
+import OptionsSignalsPanel from "@/components/OptionsSignalsPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -272,6 +277,41 @@ export default function Dashboard() {
         <div id="rebalancing" className="col-span-12">
           <PanelErrorBoundary panelName="Rebalancing">
             <RebalancingPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🐋 SIGNAL FUSION - 스마트머니(DART) + 수급(세시반) + 카일 전략 융합 */}
+        <div id="signal-fusion" className="col-span-12">
+          <PanelErrorBoundary panelName="Signal Fusion">
+            <SignalFusionPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔀 TECH DIVERGENCE - 대니얼유 관점 IT 승자/패자 분화 */}
+        <div id="tech-divergence" className="col-span-12">
+          <PanelErrorBoundary panelName="Tech Divergence">
+            <TechDivergencePanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🔍 EARNINGS REALITY CHECK - 실적 발표 사후 자동 검증 */}
+        <div id="earnings-reality" className="col-span-12">
+          <PanelErrorBoundary panelName="Earnings Reality Check">
+            <EarningsRealityCheckPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🦅 13F TRACKER - 미국 투자 전설 포트폴리오 (SEC EDGAR) */}
+        <div id="thirteen-f" className="col-span-12">
+          <PanelErrorBoundary panelName="13F Tracker">
+            <ThirteenFTrackerPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 📈 OPTIONS SIGNALS - 옵션 시장 시그널 (P/C, IV Skew, Max Pain, Unusual) */}
+        <div id="options-signals" className="col-span-12">
+          <PanelErrorBoundary panelName="Options Signals">
+            <OptionsSignalsPanel />
           </PanelErrorBoundary>
         </div>
 

@@ -62,18 +62,18 @@ export default function TradeExecutionCard({ orders, deadlineIso = DEFAULT_DEADL
 
   const resolvedOrders: Order[] = orders
     ?? (tradeIdeasData?.ideas ?? [])
-      .filter((i: any) => i.urgency === "critical" || i.urgency === "high")
+      .filter((i: any) => i.urgency === "today" || i.urgency === "this_week" || i.urgency === "critical" || i.urgency === "high")
       .slice(0, 5)
       .map((i: any) => ({
         symbol: i.symbol,
         side: i.action,
-        quantity: i.quantity ?? 0,
-        currentPrice: i.price ?? 0,
-        estimatedValue: i.estimatedValue ?? (i.price ?? 0) * (i.quantity ?? 0),
+        quantity: i.shares ?? i.quantity ?? 0,
+        currentPrice: i.currentPrice ?? i.price ?? 0,
+        estimatedValue: i.estimatedAmount ?? i.estimatedValue ?? ((i.currentPrice ?? 0) * (i.shares ?? 0)),
         confidence: i.confidence,
-        reason: i.reason,
-        urgency: i.urgency,
-        source: i.source,
+        reason: i.reasoning ?? i.reason ?? "",
+        urgency: i.urgency === "today" ? "critical" : i.urgency === "this_week" ? "high" : i.urgency,
+        source: i.sourceLabel ?? i.source ?? "",
       }));
 
   // 카운트다운

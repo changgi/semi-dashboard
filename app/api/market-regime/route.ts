@@ -170,14 +170,21 @@ export async function GET(_req: NextRequest) {
     }
 
     // 카일 포트와의 상관
-    const kylePositions = ["ORCL", "ORCX", "ORCU", "AMZU", "TSLL"];
     const kylePortfolioImpact: any[] = [];
     let portfolioData: any[] = [];
     try {
       const supabase = createAdmin();
-      const { data } = await supabase.from("portfolio").select("*");
+      const { data } = await supabase
+        .from("portfolio_holdings")
+        .select("*")
+        .eq("is_active", true);
       portfolioData = data ?? [];
     } catch {}
+
+    const LEVERAGE_BY_SYMBOL: Record<string, number> = {
+      ORCX: 2, ORCU: 2, ORCS: 2, AMZU: 2, TSLL: 2,
+      NVDU: 2, NVDL: 2, TQQQ: 3, SOXL: 3, TNA: 3,
+    };
 
     for (const pos of portfolioData) {
       const sym = pos.symbol;
@@ -187,12 +194,13 @@ export async function GET(_req: NextRequest) {
       if (sym === "TSLL") underlying = "TSLA";
 
       const bell = bells[underlying];
+      const leverage = LEVERAGE_BY_SYMBOL[sym] ?? 1;
       kylePortfolioImpact.push({
         symbol: sym,
         underlying,
         underlyingChange: bell?.changePct ?? null,
-        leverage: pos.leverage ?? 1,
-        leveragedImpact: bell?.changePct != null ? (bell.changePct * (pos.leverage ?? 1)) : null,
+        leverage,
+        leveragedImpact: bell?.changePct != null ? (bell.changePct * leverage) : null,
       });
     }
 
