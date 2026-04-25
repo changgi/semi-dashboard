@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdmin } from "@/lib/supabase";
 import { getFinnhubClient } from "@/lib/finnhub";
+import { extractKeywordsForStorage } from "@/lib/keyword-extractor";
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -86,6 +87,7 @@ export async function GET(req: NextRequest) {
       source: n.source,
       image_url: n.image,
       related_symbols: extractRelatedSymbols(n.headline + " " + n.summary),
+      keywords: extractKeywordsForStorage(n.headline, n.summary),
       published_at: new Date(n.datetime * 1000).toISOString(),
     }));
 

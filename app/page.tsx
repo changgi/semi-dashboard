@@ -102,6 +102,7 @@ import TechDivergencePanel from "@/components/TechDivergencePanel";
 import EarningsRealityCheckPanel from "@/components/EarningsRealityCheckPanel";
 import ThirteenFTrackerPanel from "@/components/ThirteenFTrackerPanel";
 import OptionsSignalsPanel from "@/components/OptionsSignalsPanel";
+import OrclInflectionPanel from "@/components/OrclInflectionPanel";
 import { ResearchDashboardPanel } from "@/components/ResearchDashboardPanel";
 import { TimeMachinePanel } from "@/components/TimeMachinePanel";
 import { EarningsSchedulePanel } from "@/components/EarningsSchedulePanel";
@@ -312,6 +313,13 @@ export default function Dashboard() {
         <div id="options-signals" className="col-span-12">
           <PanelErrorBoundary panelName="Options Signals">
             <OptionsSignalsPanel />
+          </PanelErrorBoundary>
+        </div>
+
+        {/* 🎯 ORCL INFLECTION - 카일 ORCL 테제 검증 (Bull/Bear 동등 추적) */}
+        <div id="orcl-inflection" className="col-span-12">
+          <PanelErrorBoundary panelName="ORCL Inflection">
+            <OrclInflectionPanel />
           </PanelErrorBoundary>
         </div>
 

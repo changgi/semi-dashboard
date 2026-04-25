@@ -70,6 +70,7 @@ export interface NewsItem {
   source: string | null;
   image_url: string | null;
   related_symbols: string[] | null;
+  keywords: string[] | null;
   published_at: string;
   created_at: string;
 }
